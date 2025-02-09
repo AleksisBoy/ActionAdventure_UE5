@@ -13,6 +13,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+class UInventoryComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -54,6 +55,12 @@ class AGoingActionCharacter : public ACharacter, public IHealth
 public:
 	AGoingActionCharacter();
 
+	UFUNCTION(BlueprintCallable)
+	void SaveGame(const FString& SlotName);
+
+	UFUNCTION(BlueprintCallable)
+	void LoadGameData(const FString& SlotName);
+
 	// IHealth
 	virtual void GetHit_Implementation(float Damage, FVector HitLocation) override;
 
@@ -84,6 +91,8 @@ private:
 	UPROPERTY(BlueprintReadWrite, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))
 	AActor* CurrentlyLocked = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))
+	UInventoryComponent* Inventory = nullptr;
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

@@ -12,6 +12,9 @@
 #include "InputActionValue.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Enemy.h"
+#include "Components/InventoryComponent.h"
+#include "Utility/SaveInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -53,8 +56,34 @@ AGoingActionCharacter::AGoingActionCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
+}
+
+void AGoingActionCharacter::SaveGame(const FString& SlotName)
+{
+	USaveInstance* SaveInstance = Cast<USaveInstance>(UGameplayStatics::CreateSaveGameObject(USaveInstance::StaticClass()));
+
+	if (SaveInstance)
+	{
+		SaveInstance->Inventory = Inventory->GetItems();
+		SaveInstance->Health = Health;
+
+		UGameplayStatics::SaveGameToSlot(SaveInstance, SlotName, 0);
+	}
+}
+
+void AGoingActionCharacter::LoadGameData(const FString& SlotName)
+{
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+	{
+		USaveInstance* LoadedGame = Cast<USaveInstance>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+
+		if (LoadedGame)
+		{
+			Health = LoadedGame->Health;
+			Inventory->Load(LoadedGame->Inventory);
+		}
+	}
 }
 
 void AGoingActionCharacter::GetHit_Implementation(float Damage, FVector HitLocation)
