@@ -15,6 +15,7 @@
 #include "Components/InventoryComponent.h"
 #include "Utility/SaveInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "Actors/BaseInteractableActor.h"
 
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -140,6 +141,7 @@ void AGoingActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGoingActionCharacter::Look);
 
 		EnhancedInputComponent->BindAction(CameraLockAction, ETriggerEvent::Triggered, this, &AGoingActionCharacter::TryLockCamera);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AGoingActionCharacter::Interact);
 	}
 	else
 	{
@@ -235,5 +237,28 @@ void AGoingActionCharacter::TryLockCamera(const FInputActionValue& Value)
 	for (FHitResult Hit : Hits)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Hit name: %s"), *Hit.GetActor()->GetName())
+	}
+}
+
+void AGoingActionCharacter::Interact(const FInputActionValue& Value)
+{
+	float MaximumDot = -1.f;
+	ABaseInteractableActor* ActorInFront = nullptr;
+
+	for (ABaseInteractableActor* Actor : ABaseInteractableActor::Overlapping)
+	{
+		FVector Direction = Actor->GetActorLocation() - FollowCamera->GetComponentLocation();
+		Direction.Normalize();
+		float Dot = FVector::DotProduct(FollowCamera->GetForwardVector(), Direction);
+		if (Dot > MaximumDot)
+		{
+			MaximumDot = Dot;
+			ActorInFront = Actor;
+		}
+	}
+
+	if (ActorInFront)
+	{
+		IInteractable::Execute_Interact(ActorInFront, this);
 	}
 }

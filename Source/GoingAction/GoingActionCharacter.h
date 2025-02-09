@@ -52,6 +52,9 @@ class AGoingActionCharacter : public ACharacter, public IHealth
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* OpenPlayerMenuAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
+
 public:
 	AGoingActionCharacter();
 
@@ -60,6 +63,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void LoadGameData(const FString& SlotName);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	UInventoryComponent* Inventory = nullptr;
 
 	// IHealth
 	virtual void GetHit_Implementation(float Damage, FVector HitLocation) override;
@@ -73,13 +79,15 @@ protected:
 
 	UFUNCTION()
 	void Die();
-	/** Called for movement input */
+
 	void Move(const FInputActionValue& Value);
 
-	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
 	void TryLockCamera(const FInputActionValue& Value);
+
+	void Interact(const FInputActionValue& Value);
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -91,8 +99,6 @@ private:
 	UPROPERTY(BlueprintReadWrite, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))
 	AActor* CurrentlyLocked = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))
-	UInventoryComponent* Inventory = nullptr;
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
