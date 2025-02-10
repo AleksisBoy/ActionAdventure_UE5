@@ -15,10 +15,20 @@ void AItemPickupActor::Interact_Implementation(AGoingActionCharacter* Character)
 
 	if (!Character || Looted) return;
 
-	Character->Inventory->TryAddItem(Item, Amount);
-	Looted = true;
-	SetActorTickEnabled(true);
-	if (Overlapping.Contains(this)) Overlapping.Remove(this);
+	Character->OpenPickupStashWidget(Items);
+}
+
+bool AItemPickupActor::Loot(UItemAsset* Item, int& OutAmount)
+{
+	if (Items.Contains(Item))
+	{
+		OutAmount = Items[Item];
+		Items.Remove(Item);
+
+		if (Items.Num() == 0) ItemsEmptied();
+		return true;
+	}
+	return false;
 }
 
 void AItemPickupActor::Tick(float DeltaTime)
@@ -30,4 +40,11 @@ void AItemPickupActor::Tick(float DeltaTime)
 	{
 		Destroy();
 	}
+}
+
+void AItemPickupActor::ItemsEmptied()
+{
+	Looted = true;
+	SetActorTickEnabled(true);
+	if (Overlapping.Contains(this)) Overlapping.Remove(this);
 }

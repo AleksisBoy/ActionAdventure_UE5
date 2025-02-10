@@ -7,6 +7,7 @@
 #include "ItemPickupActor.generated.h"
 
 class AGoingActionCharacter;
+class UItemAsset;
 
 UCLASS(Blueprintable, BlueprintType)
 class GOINGACTION_API AItemPickupActor : public ABaseInteractableActor
@@ -18,19 +19,26 @@ public:
 
 	virtual void Interact_Implementation(AGoingActionCharacter* Character) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Item Pickup")
+	bool Loot(UItemAsset* Item, int& OutAmount);
 protected:
 
 	virtual void Tick(float DeltaTime) override;
+
+	void ItemsEmptied();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item Pickup")
 	bool Looted = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Pickup")
-	float LifetimeOnLooted = 0.2f;
+	float LifetimeOnLooted = 0.08f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item Pickup")
+	bool DestroyOnLooted = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Pickup")
-	class UItemAsset* Item = nullptr;
+	TMap<UItemAsset*, int> Items;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Pickup")
-	int Amount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Pickup")
+	bool OpenPickupStashWidget = true;
 };

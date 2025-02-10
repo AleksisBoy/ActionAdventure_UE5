@@ -14,6 +14,9 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class UInventoryComponent;
+class ABaseInteractableActor;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractableChanged, ABaseInteractableActor*, Interactable);
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -33,6 +36,9 @@ class AGoingActionCharacter : public ACharacter, public IHealth
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* UIMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
@@ -67,6 +73,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	UInventoryComponent* Inventory = nullptr;
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character")
+	void OpenPickupStashWidget(const TMap<UItemAsset*, int>& Items);
+
+	// Dynamic Event
+	UPROPERTY(BlueprintAssignable)
+	FInteractableChanged OnInteractableChanged;
+
 	// IHealth
 	virtual void GetHit_Implementation(float Damage, FVector HitLocation) override;
 
@@ -89,12 +102,20 @@ protected:
 	void Interact(const FInputActionValue& Value);
 
 protected:
-	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-	// To add mapping context
 	virtual void BeginPlay();
 	virtual void Tick(float DeltaTime);
+
+	ABaseInteractableActor* InteractableInFront = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	float InteractionDistance = 320.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character", meta = (ClampMin = "-1.0", ClampMax = "1.0", UIMin = "-1.0", UIMax = "1.0"))
+	float MinInteractionDot = 0.2f;
+
+	void FindInteractableInFront();
 private:
 	UPROPERTY(BlueprintReadWrite, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))
 	AActor* CurrentlyLocked = nullptr;

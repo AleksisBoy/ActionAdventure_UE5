@@ -87,6 +87,7 @@ void AGoingActionCharacter::LoadGameData(const FString& SlotName)
 	}
 }
 
+
 void AGoingActionCharacter::GetHit_Implementation(float Damage, FVector HitLocation)
 {
 	Health -= Damage;
@@ -111,6 +112,38 @@ void AGoingActionCharacter::BeginPlay()
 void AGoingActionCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AGoingActionCharacter::FindInteractableInFront()
+{
+	float MaximumDot = -1.f;
+	ABaseInteractableActor* ActorInFront = nullptr;
+
+	for (ABaseInteractableActor* Actor : ABaseInteractableActor::Overlapping)
+	{
+		//FVector Direction = Actor->GetActorLocation() - FollowCamera->GetComponentLocation();
+		FVector Direction = Actor->GetActorLocation() - GetActorLocation();
+
+		// Check if Actor is in range of Interaction Distance
+		float Distance = Direction.Length();
+		if (Distance > InteractionDistance) continue;
+
+		Direction.Normalize();
+		//float Dot = FVector::DotProduct(FollowCamera->GetForwardVector(), Direction); 
+		float Dot = FVector::DotProduct(this->GetActorForwardVector(), Direction); 
+		if (Dot < MinInteractionDot) continue;
+
+		if (Dot > MaximumDot)
+		{
+			MaximumDot = Dot;
+			ActorInFront = Actor;
+		}
+	}
+	if (InteractableInFront != ActorInFront)
+	{
+		InteractableInFront = ActorInFront;
+		OnInteractableChanged.Broadcast(InteractableInFront);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -170,6 +203,8 @@ void AGoingActionCharacter::Move(const FInputActionValue& Value)
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
+
+		FindInteractableInFront();
 	}
 }
 
@@ -242,23 +277,9 @@ void AGoingActionCharacter::TryLockCamera(const FInputActionValue& Value)
 
 void AGoingActionCharacter::Interact(const FInputActionValue& Value)
 {
-	float MaximumDot = -1.f;
-	ABaseInteractableActor* ActorInFront = nullptr;
-
-	for (ABaseInteractableActor* Actor : ABaseInteractableActor::Overlapping)
+	if (InteractableInFront)
 	{
-		FVector Direction = Actor->GetActorLocation() - FollowCamera->GetComponentLocation();
-		Direction.Normalize();
-		float Dot = FVector::DotProduct(FollowCamera->GetForwardVector(), Direction);
-		if (Dot > MaximumDot)
-		{
-			MaximumDot = Dot;
-			ActorInFront = Actor;
-		}
-	}
-
-	if (ActorInFront)
-	{
-		IInteractable::Execute_Interact(ActorInFront, this);
+		IInteractable::Execute_Interact(InteractableInFront, this);
+		FindInteractableInFront();
 	}
 }
