@@ -16,6 +16,9 @@
 #include "Utility/SaveInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Actors/BaseInteractableActor.h"
+#include "Blueprint/UserWidget.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Framework/Application/NavigationConfig.h"
 
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -60,6 +63,19 @@ AGoingActionCharacter::AGoingActionCharacter()
 	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 }
 
+void AGoingActionCharacter::BeginPlay()
+{
+	// Call the base class  
+	Super::BeginPlay();
+
+	FNavigationConfig& NavigationConfig = *FSlateApplication::Get().GetNavigationConfig();
+
+	NavigationConfig.bTabNavigation = false;
+	NavigationConfig.bKeyNavigation = false;
+
+	Health = MaxHealth;
+}
+
 void AGoingActionCharacter::SaveGame(const FString& SlotName)
 {
 	USaveInstance* SaveInstance = Cast<USaveInstance>(UGameplayStatics::CreateSaveGameObject(USaveInstance::StaticClass()));
@@ -100,13 +116,6 @@ void AGoingActionCharacter::GetHit_Implementation(float Damage, FVector HitLocat
 void AGoingActionCharacter::Die()
 {
 	UE_LOG(LogTemp, Warning, TEXT("PLAYER DIED"));
-}
-void AGoingActionCharacter::BeginPlay()
-{
-	// Call the base class  
-	Super::BeginPlay();
-
-	Health = MaxHealth;
 }
 
 void AGoingActionCharacter::Tick(float DeltaTime)
@@ -152,7 +161,10 @@ void AGoingActionCharacter::FindInteractableInFront()
 void AGoingActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	UE_LOG(LogTemp, Warning, TEXT("SETUP PLAYER INPUT"));
+
+	PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
@@ -280,6 +292,5 @@ void AGoingActionCharacter::Interact(const FInputActionValue& Value)
 	if (InteractableInFront)
 	{
 		IInteractable::Execute_Interact(InteractableInFront, this);
-		FindInteractableInFront();
 	}
 }

@@ -7,6 +7,11 @@
 
 AItemPickupActor::AItemPickupActor() : Super()
 {
+}
+void AItemPickupActor::BeginPlay()
+{
+	Super::BeginPlay();
+
 	SetActorTickEnabled(false);
 }
 void AItemPickupActor::Interact_Implementation(AGoingActionCharacter* Character)
@@ -15,7 +20,20 @@ void AItemPickupActor::Interact_Implementation(AGoingActionCharacter* Character)
 
 	if (!Character || Looted) return;
 
-	Character->OpenPickupStashWidget(Items);
+	if (OpenPickupStashWidget)
+	{
+		Character->OpenPickupStashWidget(Items, this);
+	}
+	else
+	{
+		for (TPair<UItemAsset*, int> ItemPair : Items)
+		{
+			Character->Inventory->TryAddItem(ItemPair.Key, ItemPair.Value);
+		}
+		Items.Reset();
+		ItemsEmptied();
+		Character->FindInteractableInFront();
+	}
 }
 
 bool AItemPickupActor::Loot(UItemAsset* Item, int& OutAmount)
@@ -42,9 +60,16 @@ void AItemPickupActor::Tick(float DeltaTime)
 	}
 }
 
+void AItemPickupActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (Looted) return;
+
+	Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+}
+
 void AItemPickupActor::ItemsEmptied()
 {
 	Looted = true;
-	SetActorTickEnabled(true);
+	if (DestroyOnLooted) SetActorTickEnabled(true);
 	if (Overlapping.Contains(this)) Overlapping.Remove(this);
 }

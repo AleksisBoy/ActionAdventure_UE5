@@ -8,6 +8,13 @@
 #include "Interfaces/Health.h"
 #include "GoingActionCharacter.generated.h"
 
+//UENUM(Blueprintable, BlueprintType)
+//enum class FInputMode : uint8
+//{
+//	Game = 0 UMETA(DisplayName = "Game Only"),
+//	UI = 1 UMETA(DisplayName = "UI Only")
+//};
+
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -15,6 +22,8 @@ class UInputAction;
 struct FInputActionValue;
 class UInventoryComponent;
 class ABaseInteractableActor;
+class AItemPickupActor;
+class UUserWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractableChanged, ABaseInteractableActor*, Interactable);
 
@@ -36,9 +45,6 @@ class AGoingActionCharacter : public ACharacter, public IHealth
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputMappingContext* UIMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
@@ -74,7 +80,10 @@ public:
 	UInventoryComponent* Inventory = nullptr;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Character")
-	void OpenPickupStashWidget(const TMap<UItemAsset*, int>& Items);
+	void OpenPickupStashWidget(const TMap<UItemAsset*, int>& Items, AItemPickupActor* PickupActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+	void FindInteractableInFront();
 
 	// Dynamic Event
 	UPROPERTY(BlueprintAssignable)
@@ -115,10 +124,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character", meta = (ClampMin = "-1.0", ClampMax = "1.0", UIMin = "-1.0", UIMax = "1.0"))
 	float MinInteractionDot = 0.2f;
 
-	void FindInteractableInFront();
 private:
 	UPROPERTY(BlueprintReadWrite, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))
 	AActor* CurrentlyLocked = nullptr;
+
+	APlayerController* PlayerController = nullptr;
 
 public:
 	/** Returns CameraBoom subobject **/
