@@ -2,6 +2,8 @@
 
 
 #include "Components/InventoryComponent.h"
+#include <Data/ArmorAsset.h>
+#include <Data/WeaponAsset.h>
 
 UInventoryComponent::UInventoryComponent()
 {
@@ -18,12 +20,14 @@ bool UInventoryComponent::TryAddItem(UItemAsset* NewItem, int Amount)
 {
 	if (NewItem->MaxStack < Amount) Amount = NewItem->MaxStack;
 
+	// if unique should have only one such item
 	for (FItem& Item : Items)
 	{
 		if (Item.Asset == NewItem &&
 			Item.Stack + Amount <= Item.Asset->MaxStack)
 		{
 			Item.Stack += Amount;
+			UpdateWeight();
 			return true;
 		}
 	}
@@ -43,6 +47,7 @@ void UInventoryComponent::AddItem(UItemAsset* NewItem, int Amount)
 	CreatedItem.Stack = Amount;
 
 	Items.Add(CreatedItem);
+	UpdateWeight();
 }
 bool UInventoryComponent::TryRemoveItemAsset(const UItemAsset* Item, int Amount)
 {
@@ -54,6 +59,10 @@ bool UInventoryComponent::TryRemoveItemAsset(const UItemAsset* Item, int Amount)
 		if (FFItem.Stack <= 0)
 		{
 			RemoveItem(FoundItem);
+		}
+		else
+		{
+			UpdateWeight();
 		}
 		return true;
 	}
@@ -67,15 +76,26 @@ bool UInventoryComponent::TryRemoveItem(FItem& Item, int Amount)
 		Item.Stack -= Amount;
 		if (Item.Stack <= 0)
 		{
-			RemoveItem(-1);
+			RemoveItem(Item);
+		}
+		else
+		{
+			UpdateWeight();
 		}
 		return true;
 	}
 	return false;
 }
-void UInventoryComponent::RemoveItem(int Item)
+void UInventoryComponent::RemoveItem(int ItemIndex)
 {
-	Items.RemoveAt(Item);
+	Items.RemoveAt(ItemIndex);
+	UpdateWeight();
+}
+
+void UInventoryComponent::RemoveItem(FItem& Item)
+{
+	Items.Remove(Item);
+	UpdateWeight();
 }
 
 bool UInventoryComponent::HasItemStack(FItem& Item)
@@ -115,12 +135,49 @@ bool UInventoryComponent::HasItemNoUnique(const UItemAsset* CheckItem, FItem& Ou
 	return false;
 }
 
+void UInventoryComponent::AssignArmor(UArmorAsset* ArmorAsset, FItem& ItemInstance, EArmorSocket ArmorSocket)
+{
+	switch (ArmorSocket)
+	{
+	case EArmorSocket::Head:
+	{
+		HeadItem = &ItemInstance;
+		break;
+	}
+	case EArmorSocket::Chest:
+	{
+		ChestItem = &ItemInstance;
+		break;
+	}
+	case EArmorSocket::Gloves:
+	{
+		GlovesItem = &ItemInstance;
+		break;
+	}
+	case EArmorSocket::Legs:
+	{
+		LegsItem = &ItemInstance;
+		break;
+	}
+	case EArmorSocket::Boots:
+	{
+		BootsItem = &ItemInstance;
+		break;
+	}
+	}
+}
+
+void UInventoryComponent::AssignWeapon(UWeaponAsset* WeaponAsset, FItem& ItemInstance)
+{
+	WeaponItem = &ItemInstance;
+}
+
 void UInventoryComponent::Load(TArray<FItem> LoadedItems)
 {
 	this->Items = LoadedItems;
 }
 
-TArray<FItem> UInventoryComponent::GetItems()
+TArray<FItem>& UInventoryComponent::GetItems()
 {
 	return Items;
 }

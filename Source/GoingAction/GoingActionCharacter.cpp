@@ -19,6 +19,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Application/NavigationConfig.h"
+//#include <Data/WeaponAsset.h>
+#include <Data/FoodAsset.h>
 
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -152,6 +154,24 @@ void AGoingActionCharacter::FindInteractableInFront()
 	{
 		InteractableInFront = ActorInFront;
 		OnInteractableChanged.Broadcast(InteractableInFront);
+	}
+}
+
+void AGoingActionCharacter::EquipWeapon(UWeaponAsset* WeaponAsset, FItem& ItemInstance)
+{
+	Inventory->AssignWeapon(WeaponAsset, ItemInstance);
+}
+
+void AGoingActionCharacter::EquipArmor(UArmorAsset* ArmorAsset, FItem& ItemInstance, EArmorSocket ArmorSocket)
+{
+	Inventory->AssignArmor(ArmorAsset, ItemInstance, ArmorSocket);
+}
+
+void AGoingActionCharacter::EatFood(UFoodAsset* FoodAsset, FItem& ItemInstance)
+{
+	if (Inventory->TryRemoveItem(ItemInstance, 1))
+	{
+		Health += FoodAsset->HealDuration * FoodAsset->HealingPerSec;
 	}
 }
 

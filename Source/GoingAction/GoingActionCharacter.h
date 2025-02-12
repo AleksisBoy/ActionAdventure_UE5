@@ -85,6 +85,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character")
 	void FindInteractableInFront();
 
+	UFUNCTION(BlueprintCallable, Category = "Character Equipment")
+	void EquipWeapon(UWeaponAsset* WeaponAsset, FItem& ItemInstance);
+
+	UFUNCTION(BlueprintCallable, Category = "Character Equipment")
+	void EquipArmor(UArmorAsset* ArmorAsset, FItem& ItemInstance, EArmorSocket ArmorSocket);
+
+	UFUNCTION(BlueprintCallable, Category = "Character Equipment")
+	void EatFood(UFoodAsset* FoodAsset, FItem& ItemInstance);
+
 	// Dynamic Event
 	UPROPERTY(BlueprintAssignable)
 	FInteractableChanged OnInteractableChanged;

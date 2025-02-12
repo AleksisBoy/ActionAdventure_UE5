@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Data/ItemAsset.h"
+#include "Data/ArmorAsset.h"
+#include "Data/WeaponAsset.h"
 #include "InventoryComponent.generated.h"
 
 
@@ -37,14 +39,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool HasItemNoUnique(const UItemAsset* CheckItem, FItem& OutItem);
 
+
+	void AssignArmor(UArmorAsset* ArmorAsset, FItem& ItemInstance, EArmorSocket ArmorSocket);
+	void AssignWeapon(UWeaponAsset* WeaponAsset, FItem& ItemInstance);
+
 	void Load(TArray<FItem> LoadedItems);
 
-	TArray<FItem> GetItems();
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	TArray<FItem>& GetItems();
 protected:
 	virtual void BeginPlay() override;
 
 	void AddItem(UItemAsset* NewItem, int Amount);
-	void RemoveItem(int Item);
+	void RemoveItem(int ItemIndex);
+	void RemoveItem(FItem& Item);
 
 	void UpdateWeight();
 
@@ -60,4 +68,35 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TArray<FItem> Items;
+
+	// Inventory Sockets
+	// Armor Sockets
+	FItem* HeadItem;
+	FItem* ChestItem;
+	FItem* GlovesItem;
+	FItem* LegsItem;
+	FItem* BootsItem;
+
+	// Weapon Sockets
+	FItem* WeaponItem;
+
+	// Consumable Sockets
+	FItem* FoodItem;
 };
+
+//
+//USTRUCT(Blueprintable, BlueprintType)
+//struct FInventorySocket
+//{
+//	GENERATED_BODY()
+//
+//	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+//	FItem* Item;
+//
+//
+//
+//	//bool operator==(const FInventorySocket& Other) const
+//	//{
+//	//	return Item == Other.Item && Stack == Other.Stack;
+//	//}
+//};
