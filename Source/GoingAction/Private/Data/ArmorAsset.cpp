@@ -4,7 +4,7 @@
 #include "Data/ArmorAsset.h"
 #include "GoingAction/GoingActionCharacter.h"
 
-void UArmorAsset::UseItem_Implementation(AGoingActionCharacter* Character, FItem& ItemInstance)
+void UArmorAsset::UseItem_Implementation(AGoingActionCharacter* Character, UItem* ItemInstance)
 {
     // Equip Armor
     UE_LOG(LogTemp, Warning, TEXT("Equip: %s"), *ItemName.ToString());

@@ -18,5 +18,5 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Book")
 	FText Body;
 
-	virtual void UseItem_Implementation(AGoingActionCharacter* Character, FItem& ItemInstance) override;
+	virtual void UseItem_Implementation(AGoingActionCharacter* Character, UItem* ItemInstance) override;
 };

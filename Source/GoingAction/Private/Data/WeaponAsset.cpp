@@ -4,7 +4,7 @@
 #include "Data/WeaponAsset.h"
 #include "GoingAction/GoingActionCharacter.h"
 
-void UWeaponAsset::UseItem_Implementation(AGoingActionCharacter* Character, FItem& ItemInstance)
+void UWeaponAsset::UseItem_Implementation(AGoingActionCharacter* Character, UItem* ItemInstance)
 {
     // Equip the weapon
     UE_LOG(LogTemp, Warning, TEXT("Weapon Equipped: %s"), *ItemName.ToString());

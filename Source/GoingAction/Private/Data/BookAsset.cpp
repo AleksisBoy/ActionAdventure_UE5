@@ -4,7 +4,7 @@
 #include "Data/BookAsset.h"
 #include "GoingAction/GoingActionCharacter.h"
 
-void UBookAsset::UseItem_Implementation(AGoingActionCharacter* Character, FItem& ItemInstance)
+void UBookAsset::UseItem_Implementation(AGoingActionCharacter* Character, UItem* ItemInstance)
 {
     // Read Book
     UE_LOG(LogTemp, Warning, TEXT("Read: %s"), *ItemName.ToString());

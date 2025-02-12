@@ -16,5 +16,5 @@ public:
 	FVector2D DamageRange = FVector2D();
 
 
-	virtual void UseItem_Implementation(AGoingActionCharacter* Character, FItem& ItemInstance) override;
+	virtual void UseItem_Implementation(AGoingActionCharacter* Character, UItem* ItemInstance) override;
 };

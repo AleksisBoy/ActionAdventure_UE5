@@ -4,7 +4,7 @@
 #include "Data/FoodAsset.h"
 #include "GoingAction/GoingActionCharacter.h"
 
-void UFoodAsset::UseItem_Implementation(AGoingActionCharacter* Character, FItem& ItemInstance)
+void UFoodAsset::UseItem_Implementation(AGoingActionCharacter* Character, UItem* ItemInstance)
 {
     // Heal Player
     UE_LOG(LogTemp, Warning, TEXT("Eating: %s"), *ItemName.ToString());

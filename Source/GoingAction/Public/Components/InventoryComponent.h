@@ -25,10 +25,10 @@ public:
 	bool TryRemoveItemAsset(const UItemAsset* Item, int Amount);
 	
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool TryRemoveItem(FItem& Item, int Amount);
+	bool TryRemoveItem(UItem* Item, int Amount);
 	
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool HasItemStack(FItem& Item);
+	bool HasItemStack(UItem* Item);
 	
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool HasFreeSlot();
@@ -37,22 +37,22 @@ public:
 	bool HasItem(const UItemAsset* CheckItem, int& OutItem);
 	
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool HasItemNoUnique(const UItemAsset* CheckItem, FItem& OutItem);
+	bool HasItemNoUnique(const UItemAsset* CheckItem, UItem*& OutItem);
 
 
-	void AssignArmor(UArmorAsset* ArmorAsset, FItem& ItemInstance, EArmorSocket ArmorSocket);
-	void AssignWeapon(UWeaponAsset* WeaponAsset, FItem& ItemInstance);
+	void AssignArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket);
+	void AssignWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance);
 
-	void Load(TArray<FItem> LoadedItems);
+	void Load(TArray<UItem*> LoadedItems);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	TArray<FItem>& GetItems();
+	TArray<UItem*> GetItems();
 protected:
 	virtual void BeginPlay() override;
 
 	void AddItem(UItemAsset* NewItem, int Amount);
 	void RemoveItem(int ItemIndex);
-	void RemoveItem(FItem& Item);
+	void RemoveItem(UItem* Item);
 
 	void UpdateWeight();
 
@@ -67,21 +67,21 @@ protected:
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	TArray<FItem> Items;
+	TArray<UItem*> Items;
 
 	// Inventory Sockets
 	// Armor Sockets
-	FItem* HeadItem;
-	FItem* ChestItem;
-	FItem* GlovesItem;
-	FItem* LegsItem;
-	FItem* BootsItem;
+	UItem* HeadItem;
+	UItem* ChestItem;
+	UItem* GlovesItem;
+	UItem* LegsItem;
+	UItem* BootsItem;
 
 	// Weapon Sockets
-	FItem* WeaponItem;
+	UItem* WeaponItem;
 
 	// Consumable Sockets
-	FItem* FoodItem;
+	UItem* FoodItem;
 };
 
 //
@@ -91,7 +91,7 @@ private:
 //	GENERATED_BODY()
 //
 //	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-//	FItem* Item;
+//	UItem* Item;
 //
 //
 //

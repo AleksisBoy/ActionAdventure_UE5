@@ -84,7 +84,7 @@ void AGoingActionCharacter::SaveGame(const FString& SlotName)
 
 	if (SaveInstance)
 	{
-		SaveInstance->Inventory = Inventory->GetItems();
+		SaveInstance->AssignInventory(Inventory->GetItems());
 		SaveInstance->Health = Health;
 
 		UGameplayStatics::SaveGameToSlot(SaveInstance, SlotName, 0);
@@ -100,7 +100,7 @@ void AGoingActionCharacter::LoadGameData(const FString& SlotName)
 		if (LoadedGame)
 		{
 			Health = LoadedGame->Health;
-			Inventory->Load(LoadedGame->Inventory);
+			Inventory->Load(LoadedGame->LoadInventory());
 		}
 	}
 }
@@ -157,17 +157,17 @@ void AGoingActionCharacter::FindInteractableInFront()
 	}
 }
 
-void AGoingActionCharacter::EquipWeapon(UWeaponAsset* WeaponAsset, FItem& ItemInstance)
+void AGoingActionCharacter::EquipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance)
 {
 	Inventory->AssignWeapon(WeaponAsset, ItemInstance);
 }
 
-void AGoingActionCharacter::EquipArmor(UArmorAsset* ArmorAsset, FItem& ItemInstance, EArmorSocket ArmorSocket)
+void AGoingActionCharacter::EquipArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket)
 {
 	Inventory->AssignArmor(ArmorAsset, ItemInstance, ArmorSocket);
 }
 
-void AGoingActionCharacter::EatFood(UFoodAsset* FoodAsset, FItem& ItemInstance)
+void AGoingActionCharacter::EatFood(UFoodAsset* FoodAsset, UItem* ItemInstance)
 {
 	if (Inventory->TryRemoveItem(ItemInstance, 1))
 	{

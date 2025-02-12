@@ -7,6 +7,25 @@
 #include "Data/ItemAsset.h"
 #include "SaveInstance.generated.h"
 
+
+USTRUCT(Blueprintable, BlueprintType)
+struct FItemSaved
+{
+    GENERATED_BODY()
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    UItemAsset* Asset;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int Stack = 0;
+
+
+    bool operator==(const FItemSaved& Other) const
+    {
+        return Asset == Other.Asset && Stack == Other.Stack;
+    }
+}; 
+
 UCLASS()
 class GOINGACTION_API USaveInstance : public USaveGame
 {
@@ -19,5 +38,8 @@ public:
     float Health;
 
     UPROPERTY(BlueprintReadWrite, Category = "SaveGame")
-    TArray<FItem> Inventory;
+    TArray<FItemSaved> Inventory;
+
+    void AssignInventory(TArray<UItem*> ItemInstances);
+    TArray<UItem*> LoadInventory();
 };

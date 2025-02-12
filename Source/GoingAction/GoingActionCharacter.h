@@ -86,13 +86,13 @@ public:
 	void FindInteractableInFront();
 
 	UFUNCTION(BlueprintCallable, Category = "Character Equipment")
-	void EquipWeapon(UWeaponAsset* WeaponAsset, FItem& ItemInstance);
+	void EquipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance);
 
 	UFUNCTION(BlueprintCallable, Category = "Character Equipment")
-	void EquipArmor(UArmorAsset* ArmorAsset, FItem& ItemInstance, EArmorSocket ArmorSocket);
+	void EquipArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket);
 
 	UFUNCTION(BlueprintCallable, Category = "Character Equipment")
-	void EatFood(UFoodAsset* FoodAsset, FItem& ItemInstance);
+	void EatFood(UFoodAsset* FoodAsset, UItem* ItemInstance);
 
 	// Dynamic Event
 	UPROPERTY(BlueprintAssignable)

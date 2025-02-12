@@ -19,8 +19,28 @@
 class AGoingActionCharacter;
 
 
+UCLASS(Blueprintable, BlueprintType)
+class UItem : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    UItemAsset* Asset;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int Stack = 0;
+
+
+    //bool operator==(const UItem& Other) const
+    //{
+    //    return Asset == Other.Asset && Stack == Other.Stack;
+    //}
+};
+/*
+
 USTRUCT(Blueprintable, BlueprintType)
-struct FItem
+struct UItem
 {
     GENERATED_BODY()
 
@@ -31,11 +51,11 @@ struct FItem
     int Stack = 0;
 
 
-    bool operator==(const FItem& Other) const
+    bool operator==(const UItem& Other) const
     {
         return Asset == Other.Asset && Stack == Other.Stack;
     }
-};
+};*/
 
 UCLASS(Abstract, Blueprintable, BlueprintType)
 class GOINGACTION_API UItemAsset : public UDataAsset
@@ -60,9 +80,9 @@ public:
 
 
     UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-    void UseItem(AGoingActionCharacter* Character, UPARAM(ref)FItem& ItemInstance);
+    void UseItem(AGoingActionCharacter* Character, UItem* ItemInstance);
 
-    virtual void UseItem_Implementation(AGoingActionCharacter* Character, FItem& ItemInstance) {};
+    virtual void UseItem_Implementation(AGoingActionCharacter* Character, UItem* ItemInstance) {};
 };
 
 

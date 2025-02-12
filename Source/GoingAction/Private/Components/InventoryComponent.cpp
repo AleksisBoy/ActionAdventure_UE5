@@ -21,12 +21,12 @@ bool UInventoryComponent::TryAddItem(UItemAsset* NewItem, int Amount)
 	if (NewItem->MaxStack < Amount) Amount = NewItem->MaxStack;
 
 	// if unique should have only one such item
-	for (FItem& Item : Items)
+	for (UItem* Item : Items)
 	{
-		if (Item.Asset == NewItem &&
-			Item.Stack + Amount <= Item.Asset->MaxStack)
+		if (Item->Asset == NewItem &&
+			Item->Stack + Amount <= Item->Asset->MaxStack)
 		{
-			Item.Stack += Amount;
+			Item->Stack += Amount;
 			UpdateWeight();
 			return true;
 		}
@@ -42,9 +42,9 @@ bool UInventoryComponent::TryAddItem(UItemAsset* NewItem, int Amount)
 
 void UInventoryComponent::AddItem(UItemAsset* NewItem, int Amount)
 {
-	FItem CreatedItem = FItem();
-	CreatedItem.Asset = NewItem;
-	CreatedItem.Stack = Amount;
+	UItem* CreatedItem = NewObject<UItem>();
+	CreatedItem->Asset = NewItem;
+	CreatedItem->Stack = Amount;
 
 	Items.Add(CreatedItem);
 	UpdateWeight();
@@ -54,9 +54,9 @@ bool UInventoryComponent::TryRemoveItemAsset(const UItemAsset* Item, int Amount)
 	int FoundItem;
 	if (HasItem(Item, FoundItem))
 	{
-		FItem& FFItem = Items[FoundItem];
-		FFItem.Stack -= Amount;
-		if (FFItem.Stack <= 0)
+		UItem* FUItem = Items[FoundItem];
+		FUItem->Stack -= Amount;
+		if (FUItem->Stack <= 0)
 		{
 			RemoveItem(FoundItem);
 		}
@@ -69,12 +69,12 @@ bool UInventoryComponent::TryRemoveItemAsset(const UItemAsset* Item, int Amount)
 	return false;
 }
 
-bool UInventoryComponent::TryRemoveItem(FItem& Item, int Amount)
+bool UInventoryComponent::TryRemoveItem(UItem* Item, int Amount)
 {
 	if (Items.Contains(Item))
 	{
-		Item.Stack -= Amount;
-		if (Item.Stack <= 0)
+		Item->Stack -= Amount;
+		if (Item->Stack <= 0)
 		{
 			RemoveItem(Item);
 		}
@@ -92,13 +92,13 @@ void UInventoryComponent::RemoveItem(int ItemIndex)
 	UpdateWeight();
 }
 
-void UInventoryComponent::RemoveItem(FItem& Item)
+void UInventoryComponent::RemoveItem(UItem* Item)
 {
 	Items.Remove(Item);
 	UpdateWeight();
 }
 
-bool UInventoryComponent::HasItemStack(FItem& Item)
+bool UInventoryComponent::HasItemStack(UItem* Item)
 {
 	return false;
 }
@@ -112,7 +112,7 @@ bool UInventoryComponent::HasItem(const UItemAsset* CheckItem, int& OutItem)
 {
 	for (int i = 0; i < Items.Num(); i++)
 	{
-		if (Items[i].Asset == CheckItem)
+		if (Items[i]->Asset == CheckItem)
 		{
 			OutItem = i;
 			return true;
@@ -120,13 +120,13 @@ bool UInventoryComponent::HasItem(const UItemAsset* CheckItem, int& OutItem)
 	}
 	return false;
 }
-bool UInventoryComponent::HasItemNoUnique(const UItemAsset* CheckItem, FItem& OutItem)
+bool UInventoryComponent::HasItemNoUnique(const UItemAsset* CheckItem, UItem*& OutItem)
 {
-	for (FItem Item : Items)
+	for (UItem* Item : Items)
 	{
-		if (Item.Asset->Unique) continue;
+		if (Item->Asset->Unique) continue;
 
-		if (Item.Asset == CheckItem)
+		if (Item->Asset == CheckItem)
 		{
 			OutItem = Item;
 			return true;
@@ -135,49 +135,49 @@ bool UInventoryComponent::HasItemNoUnique(const UItemAsset* CheckItem, FItem& Ou
 	return false;
 }
 
-void UInventoryComponent::AssignArmor(UArmorAsset* ArmorAsset, FItem& ItemInstance, EArmorSocket ArmorSocket)
+void UInventoryComponent::AssignArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket)
 {
 	switch (ArmorSocket)
 	{
 	case EArmorSocket::Head:
 	{
-		HeadItem = &ItemInstance;
+		HeadItem = ItemInstance;
 		break;
 	}
 	case EArmorSocket::Chest:
 	{
-		ChestItem = &ItemInstance;
+		ChestItem = ItemInstance;
 		break;
 	}
 	case EArmorSocket::Gloves:
 	{
-		GlovesItem = &ItemInstance;
+		GlovesItem = ItemInstance;
 		break;
 	}
 	case EArmorSocket::Legs:
 	{
-		LegsItem = &ItemInstance;
+		LegsItem = ItemInstance;
 		break;
 	}
 	case EArmorSocket::Boots:
 	{
-		BootsItem = &ItemInstance;
+		BootsItem = ItemInstance;
 		break;
 	}
 	}
 }
 
-void UInventoryComponent::AssignWeapon(UWeaponAsset* WeaponAsset, FItem& ItemInstance)
+void UInventoryComponent::AssignWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance)
 {
-	WeaponItem = &ItemInstance;
+	WeaponItem = ItemInstance;
 }
 
-void UInventoryComponent::Load(TArray<FItem> LoadedItems)
+void UInventoryComponent::Load(TArray<UItem*> LoadedItems)
 {
 	this->Items = LoadedItems;
 }
 
-TArray<FItem>& UInventoryComponent::GetItems()
+TArray<UItem*> UInventoryComponent::GetItems()
 {
 	return Items;
 }
@@ -185,9 +185,9 @@ TArray<FItem>& UInventoryComponent::GetItems()
 
 void UInventoryComponent::UpdateWeight()
 {
-	for (FItem Item : Items)
+	for (UItem* Item : Items)
 	{
-		Weight += Item.Asset->Weight * Item.Stack;
+		Weight += Item->Asset->Weight * Item->Stack;
 	}
 	if (Weight > MaxWeight)
 	{

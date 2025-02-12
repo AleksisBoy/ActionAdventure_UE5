@@ -29,5 +29,5 @@ public:
     float ArmorStrength = 1.f;
 
 
-    virtual void UseItem_Implementation(AGoingActionCharacter* Character, FItem& ItemInstance) override;
+    virtual void UseItem_Implementation(AGoingActionCharacter* Character, UItem* ItemInstance) override;
 };
