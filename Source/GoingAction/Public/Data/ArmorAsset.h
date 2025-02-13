@@ -9,10 +9,9 @@
 UENUM(Blueprintable, BlueprintType)
 enum class EArmorSocket : uint8
 {
-    Head UMETA(DisplayName = "Head"),
-    Gloves UMETA(DisplayName = "Gloves"),
     Chest UMETA(DisplayName = "Chest"),
-    Legs UMETA(DisplayName = "Legs"),
+    Gloves UMETA(DisplayName = "Gloves"),
+    Trousers UMETA(DisplayName = "Trousers"),
     Boots UMETA(DisplayName = "Boots")
 };
 

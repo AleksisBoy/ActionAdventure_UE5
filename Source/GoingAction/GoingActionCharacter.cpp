@@ -70,12 +70,17 @@ void AGoingActionCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	// Turn off UI Tab and Key navigation
 	FNavigationConfig& NavigationConfig = *FSlateApplication::Get().GetNavigationConfig();
 
 	NavigationConfig.bTabNavigation = false;
 	NavigationConfig.bKeyNavigation = false;
 
+	// Health
 	Health = MaxHealth;
+
+	// Inventory 
+	Inventory->OnEquipmentChanged.AddDynamic(this, &AGoingActionCharacter::UpdateStats);
 }
 
 void AGoingActionCharacter::SaveGame(const FString& SlotName)
@@ -125,6 +130,11 @@ void AGoingActionCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AGoingActionCharacter::UpdateStats()
+{
+	Defense = Inventory->GetEquippedArmorDefense();
+}
+
 void AGoingActionCharacter::FindInteractableInFront()
 {
 	float MaximumDot = -1.f;
@@ -159,12 +169,12 @@ void AGoingActionCharacter::FindInteractableInFront()
 
 void AGoingActionCharacter::EquipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance)
 {
-	Inventory->AssignWeapon(WeaponAsset, ItemInstance);
+	Inventory->EquipWeapon(WeaponAsset, ItemInstance);
 }
 
 void AGoingActionCharacter::EquipArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket)
 {
-	Inventory->AssignArmor(ArmorAsset, ItemInstance, ArmorSocket);
+	Inventory->EquipArmor(ArmorAsset, ItemInstance, ArmorSocket);
 }
 
 void AGoingActionCharacter::EatFood(UFoodAsset* FoodAsset, UItem* ItemInstance)

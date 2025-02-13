@@ -125,6 +125,8 @@ protected:
 	virtual void BeginPlay();
 	virtual void Tick(float DeltaTime);
 
+	void UpdateStats();
+
 	ABaseInteractableActor* InteractableInFront = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
@@ -139,6 +141,8 @@ private:
 
 	APlayerController* PlayerController = nullptr;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Character Stats", meta = (AllowPrivateAccess = "true"))
+	float Defense = 0.f;
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

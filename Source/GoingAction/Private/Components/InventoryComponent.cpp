@@ -135,46 +135,116 @@ bool UInventoryComponent::HasItemNoUnique(const UItemAsset* CheckItem, UItem*& O
 	return false;
 }
 
-void UInventoryComponent::AssignArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket)
+void UInventoryComponent::EquipArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket)
 {
 	switch (ArmorSocket)
 	{
-	case EArmorSocket::Head:
-	{
-		HeadItem = ItemInstance;
-		break;
-	}
 	case EArmorSocket::Chest:
 	{
-		ChestItem = ItemInstance;
+		if (ChestItem == ItemInstance) DequipArmor(ArmorAsset, ItemInstance, ArmorSocket);
+		else ChestItem = ItemInstance;
 		break;
 	}
 	case EArmorSocket::Gloves:
 	{
-		GlovesItem = ItemInstance;
+		if (GlovesItem == ItemInstance) DequipArmor(ArmorAsset, ItemInstance, ArmorSocket);
+		else GlovesItem = ItemInstance;
 		break;
 	}
-	case EArmorSocket::Legs:
+	case EArmorSocket::Trousers:
 	{
-		LegsItem = ItemInstance;
+		if(TrousersItem == ItemInstance) DequipArmor(ArmorAsset, ItemInstance, ArmorSocket);
+		else TrousersItem = ItemInstance;
 		break;
 	}
 	case EArmorSocket::Boots:
 	{
-		BootsItem = ItemInstance;
+		if(BootsItem == ItemInstance) DequipArmor(ArmorAsset, ItemInstance, ArmorSocket);
+		else BootsItem = ItemInstance;
+		break;
+	}
+	}
+
+	OnEquipmentChanged.Broadcast();
+}
+
+void UInventoryComponent::EquipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance)
+{
+	if (WeaponItem == ItemInstance) DequipWeapon(WeaponAsset, ItemInstance);
+	else WeaponItem = ItemInstance;
+
+	OnEquipmentChanged.Broadcast();
+}
+
+void UInventoryComponent::DequipArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket)
+{
+	switch (ArmorSocket)
+	{
+	case EArmorSocket::Chest:
+	{
+		ChestItem = nullptr;
+		break;
+	}
+	case EArmorSocket::Gloves:
+	{
+		GlovesItem = nullptr;
+		break;
+	}
+	case EArmorSocket::Trousers:
+	{
+		TrousersItem = nullptr;
+		break;
+	}
+	case EArmorSocket::Boots:
+	{
+		BootsItem = nullptr;
 		break;
 	}
 	}
 }
 
-void UInventoryComponent::AssignWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance)
+void UInventoryComponent::DequipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance)
 {
-	WeaponItem = ItemInstance;
+	WeaponItem = nullptr;
 }
 
 void UInventoryComponent::Load(TArray<UItem*> LoadedItems)
 {
 	this->Items = LoadedItems;
+}
+
+float UInventoryComponent::GetEquippedArmorDefense()
+{
+	float Defense = 0.f;
+	if (ChestItem)
+	{
+		if (UArmorAsset* ArmorAsset = Cast<UArmorAsset>(ChestItem->Asset))
+		{
+			Defense += ArmorAsset->ArmorStrength;
+		}
+	}
+	if (GlovesItem)
+	{
+		if (UArmorAsset* ArmorAsset = Cast<UArmorAsset>(GlovesItem->Asset))
+		{
+			Defense += ArmorAsset->ArmorStrength;
+		}
+	}
+	if (TrousersItem)
+	{
+		if (UArmorAsset* ArmorAsset = Cast<UArmorAsset>(TrousersItem->Asset))
+		{
+			Defense += ArmorAsset->ArmorStrength;
+		}
+	}
+	if (BootsItem)
+	{
+		if (UArmorAsset* ArmorAsset = Cast<UArmorAsset>(BootsItem->Asset))
+		{
+			Defense += ArmorAsset->ArmorStrength;
+		}
+	}
+	return Defense;
 }
 
 TArray<UItem*> UInventoryComponent::GetItems()

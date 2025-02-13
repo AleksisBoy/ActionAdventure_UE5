@@ -9,6 +9,7 @@
 #include "Data/WeaponAsset.h"
 #include "InventoryComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEquipmentChanged);
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GOINGACTION_API UInventoryComponent : public UActorComponent
@@ -40,10 +41,20 @@ public:
 	bool HasItemNoUnique(const UItemAsset* CheckItem, UItem*& OutItem);
 
 
-	void AssignArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket);
-	void AssignWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance);
+	void EquipArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket);
+	void EquipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance);
+
+	void DequipArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket);
+	void DequipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance);
+
+	UPROPERTY(BlueprintAssignable)
+	FEquipmentChanged OnEquipmentChanged;
 
 	void Load(TArray<UItem*> LoadedItems);
+
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	float GetEquippedArmorDefense();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	TArray<UItem*> GetItems();
@@ -71,10 +82,13 @@ private:
 
 	// Inventory Sockets
 	// Armor Sockets
-	UItem* HeadItem;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UItem* ChestItem;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UItem* GlovesItem;
-	UItem* LegsItem;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	UItem* TrousersItem;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UItem* BootsItem;
 
 	// Weapon Sockets
