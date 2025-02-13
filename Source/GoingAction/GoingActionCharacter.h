@@ -125,6 +125,7 @@ protected:
 	virtual void BeginPlay();
 	virtual void Tick(float DeltaTime);
 
+	UFUNCTION()
 	void UpdateStats();
 
 	ABaseInteractableActor* InteractableInFront = nullptr;
