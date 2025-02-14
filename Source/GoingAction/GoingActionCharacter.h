@@ -25,7 +25,7 @@ class ABaseInteractableActor;
 class AItemPickupActor;
 class UUserWidget;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractableChanged, ABaseInteractableActor*, Interactable);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractableChanged, TScriptInterface<IInteractable>, Interactable);
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -99,7 +99,11 @@ public:
 	FInteractableChanged OnInteractableChanged;
 
 	// IHealth
-	virtual void GetHit_Implementation(float Damage, FVector HitLocation) override;
+	virtual void GetHit(float Damage, FVector HitLocation) override;
+	virtual ELoyalty GetLoyalty() override;
+	virtual FVector GetInterfaceLocation() override;
+	virtual bool TakeTokens(int Tokens) override;
+	virtual void ReturnTokens(int Tokens) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 	float MaxHealth = 100.f;
@@ -126,9 +130,20 @@ protected:
 	virtual void Tick(float DeltaTime);
 
 	UFUNCTION()
+	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	TArray<IInteractable*> OverlappingInteractables;
+
+	UFUNCTION()
 	void UpdateStats();
 
-	ABaseInteractableActor* InteractableInFront = nullptr;
+	IInteractable* InteractableInFront = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	float InteractionDistance = 320.f;
@@ -136,7 +151,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character", meta = (ClampMin = "-1.0", ClampMax = "1.0", UIMin = "-1.0", UIMax = "1.0"))
 	float MinInteractionDot = 0.2f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	int AttackTokens = 1;
 private:
+
 	UPROPERTY(BlueprintReadWrite, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))
 	AActor* CurrentlyLocked = nullptr;
 

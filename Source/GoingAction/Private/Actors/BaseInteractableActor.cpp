@@ -5,7 +5,6 @@
 #include "Components/BoxComponent.h"
 #include "GoingAction/GoingActionCharacter.h"
 
-TArray<ABaseInteractableActor*> ABaseInteractableActor::Overlapping;
 
 ABaseInteractableActor::ABaseInteractableActor()
 {
@@ -24,9 +23,24 @@ ABaseInteractableActor::ABaseInteractableActor()
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void ABaseInteractableActor::Interact_Implementation(AGoingActionCharacter* Character)
+void ABaseInteractableActor::Interact(AGoingActionCharacter* Character)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Interacted with %s"), *GetName());
+}
+
+FVector ABaseInteractableActor::GetInterfaceLocation()
+{
+	return GetActorLocation();
+}
+
+bool ABaseInteractableActor::IsAbleToInteract()
+{
+	return false;
+}
+
+FText ABaseInteractableActor::GetInteractionName()
+{
+	return FText::FromString("DEFAULT");
 }
 
 void ABaseInteractableActor::BeginPlay()
@@ -39,21 +53,21 @@ void ABaseInteractableActor::BeginPlay()
 
 void ABaseInteractableActor::EndPlay(const EEndPlayReason::Type Reason)
 {
-	if (Overlapping.Contains(this))
+	/*if (Overlapping.Contains(this))
 	{
 		Overlapping.Remove(this);
-	}
+	}*/
 }
 
 void ABaseInteractableActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Overlapping.AddUnique(this);
+	//Overlapping.AddUnique(this);
 	UE_LOG(LogTemp, Warning, TEXT("OVERLAP: %s"), *OtherActor->GetName())
 }
 
 void ABaseInteractableActor::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (Overlapping.Contains(this)) Overlapping.Remove(this);
+	//if (Overlapping.Contains(this)) Overlapping.Remove(this);
 }
 
 

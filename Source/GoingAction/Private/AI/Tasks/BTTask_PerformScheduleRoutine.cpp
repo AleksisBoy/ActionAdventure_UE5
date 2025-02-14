@@ -12,15 +12,14 @@ EBTNodeResult::Type UBTTask_PerformScheduleRoutine::ExecuteTask(UBehaviorTreeCom
 	// check for time?
 	// play according animation
 
-	return EBTNodeResult::InProgress;
 	if (ANonPlayableCharacter* NPC = Cast<ANonPlayableCharacter>(OwnerComp.GetOwner()))
 	{
-		FNPCScheduleEvent Schedule = {};
-		if (NPC->GetCurrentSchedule(Schedule))
-		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation", AWorldLocation::Get(Schedule.Location)->GetActorLocation());
-			return EBTNodeResult::Succeeded;
-		}
+		int CurrentScheduleIndex = OwnerComp.GetBlackboardComponent()->GetValueAsInt("CurrentScheduleIndex");
+
+		OwnerComp.GetBlackboardComponent()->SetValueAsFloat("ScheduleInteractionWaitTime", NPC->GetSchedule(CurrentScheduleIndex).ActivityWaitTime);
+		
+		// Launch animation
+		return EBTNodeResult::Succeeded;
 	}
-	return EBTNodeResult::Type();
+	return EBTNodeResult::Failed;
 }

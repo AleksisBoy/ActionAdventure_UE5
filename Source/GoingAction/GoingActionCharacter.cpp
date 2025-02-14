@@ -21,6 +21,8 @@
 #include "Framework/Application/NavigationConfig.h"
 //#include <Data/WeaponAsset.h>
 #include <Data/FoodAsset.h>
+#include "Interfaces/Interactable.h"
+#include "AI/CombatSubsystem.h"
 
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -70,6 +72,12 @@ void AGoingActionCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+
+	if (UCombatSubsystem* CombatSub = GetWorld()->GetSubsystem<UCombatSubsystem>())
+	{
+		CombatSub->StartCombat(this);
+	}
+
 	// Turn off UI Tab and Key navigation
 	FNavigationConfig& NavigationConfig = *FSlateApplication::Get().GetNavigationConfig();
 
@@ -81,6 +89,9 @@ void AGoingActionCharacter::BeginPlay()
 
 	// Inventory 
 	Inventory->OnEquipmentChanged.AddDynamic(this, &AGoingActionCharacter::UpdateStats);
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AGoingActionCharacter::OnOverlapBegin);
+	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AGoingActionCharacter::OnOverlapEnd);
 }
 
 void AGoingActionCharacter::SaveGame(const FString& SlotName)
@@ -111,13 +122,36 @@ void AGoingActionCharacter::LoadGameData(const FString& SlotName)
 }
 
 
-void AGoingActionCharacter::GetHit_Implementation(float Damage, FVector HitLocation)
+void AGoingActionCharacter::GetHit(float Damage, FVector HitLocation)
 {
 	Health -= Damage;
 	if (Health <= 0.f)
 	{
 		Die();
 	}
+}
+
+ELoyalty AGoingActionCharacter::GetLoyalty()
+{
+	return ELoyalty::Friendly;
+}
+
+FVector AGoingActionCharacter::GetInterfaceLocation()
+{
+	return GetActorLocation();
+}
+
+bool AGoingActionCharacter::TakeTokens(int Tokens)
+{
+	if (AttackTokens < Tokens) return false;
+
+	AttackTokens -= Tokens;
+	return true;
+}
+
+void AGoingActionCharacter::ReturnTokens(int Tokens)
+{
+	AttackTokens += Tokens;
 }
 
 void AGoingActionCharacter::Die()
@@ -130,6 +164,23 @@ void AGoingActionCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AGoingActionCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetName())
+	if (IInteractable* InteractableOverlapped = Cast<IInteractable>(OtherActor))
+	{
+		OverlappingInteractables.AddUnique(InteractableOverlapped);
+	}
+}
+
+void AGoingActionCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (IInteractable* InteractableOverlapped = Cast<IInteractable>(OtherActor))
+	{
+		OverlappingInteractables.Remove(InteractableOverlapped);
+	}
+}
+
 void AGoingActionCharacter::UpdateStats()
 {
 	Defense = Inventory->GetEquippedArmorDefense();
@@ -138,13 +189,15 @@ void AGoingActionCharacter::UpdateStats()
 void AGoingActionCharacter::FindInteractableInFront()
 {
 	float MaximumDot = -1.f;
-	ABaseInteractableActor* ActorInFront = nullptr;
+	IInteractable* NewInteractableInFront = nullptr;
 
-	for (ABaseInteractableActor* Actor : ABaseInteractableActor::Overlapping)
+	for (IInteractable* Interactable : OverlappingInteractables)
 	{
-		//FVector Direction = Actor->GetActorLocation() - FollowCamera->GetComponentLocation();
-		FVector Direction = Actor->GetActorLocation() - GetActorLocation();
+		if (!Interactable->IsAbleToInteract()) continue;
 
+		//FVector Direction = Actor->GetActorLocation() - FollowCamera->GetComponentLocation();
+		FVector Direction = Interactable->GetInterfaceLocation() - GetActorLocation();
+		
 		// Check if Actor is in range of Interaction Distance
 		float Distance = Direction.Length();
 		if (Distance > InteractionDistance) continue;
@@ -157,13 +210,20 @@ void AGoingActionCharacter::FindInteractableInFront()
 		if (Dot > MaximumDot)
 		{
 			MaximumDot = Dot;
-			ActorInFront = Actor;
+			NewInteractableInFront = Interactable;
 		}
 	}
-	if (InteractableInFront != ActorInFront)
+	if (InteractableInFront != NewInteractableInFront)
 	{
-		InteractableInFront = ActorInFront;
-		OnInteractableChanged.Broadcast(InteractableInFront);
+		InteractableInFront = NewInteractableInFront;
+		if (InteractableInFront)
+		{
+			OnInteractableChanged.Broadcast(InteractableInFront->_getUObject());
+		}
+		else
+		{
+			OnInteractableChanged.Broadcast(nullptr);
+		}
 	}
 }
 
@@ -321,6 +381,6 @@ void AGoingActionCharacter::Interact(const FInputActionValue& Value)
 {
 	if (InteractableInFront)
 	{
-		IInteractable::Execute_Interact(InteractableInFront, this);
+		InteractableInFront->Interact(this);
 	}
 }

@@ -17,10 +17,13 @@ class GOINGACTION_API AItemPickupActor : public ABaseInteractableActor
 public:
 	AItemPickupActor();
 
-	virtual void Interact_Implementation(AGoingActionCharacter* Character) override;
-
 	UFUNCTION(BlueprintCallable, Category = "Item Pickup")
 	bool Loot(UItemAsset* Item, int& OutAmount);
+
+	virtual void Interact(AGoingActionCharacter* Character) override;
+	virtual FVector GetInterfaceLocation() override;
+	virtual bool IsAbleToInteract() override;
+	virtual FText GetInteractionName() override;
 protected:
 
 	virtual void BeginPlay() override;

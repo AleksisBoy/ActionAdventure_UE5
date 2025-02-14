@@ -15,12 +15,12 @@ EBTNodeResult::Type UBTTask_AcknowledgeSchedule::ExecuteTask(UBehaviorTreeCompon
 	AAIController* Controller = OwnerComp.GetAIOwner();
 	if (ANonPlayableCharacter* NPC = Cast<ANonPlayableCharacter>(Controller->GetPawn()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CAST TRUE"));
 		FNPCScheduleEvent Schedule = {};
-		if (NPC->GetCurrentSchedule(Schedule))
+		int Index = 0;
+		if (NPC->GetCurrentSchedule(Schedule, Index))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("SCHEDULE TRUE"));
 			OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation", AWorldLocation::Get(Schedule.Location)->GetActorLocation());
+			OwnerComp.GetBlackboardComponent()->SetValueAsInt("CurrentScheduleIndex", Index);
 			return EBTNodeResult::Succeeded;
 		}
 	}

@@ -14,9 +14,9 @@ void AItemPickupActor::BeginPlay()
 
 	SetActorTickEnabled(false);
 }
-void AItemPickupActor::Interact_Implementation(AGoingActionCharacter* Character)
+void AItemPickupActor::Interact(AGoingActionCharacter* Character)
 {
-	Super::Interact_Implementation(Character);
+	Super::Interact(Character);
 
 	if (!Character || Looted) return;
 
@@ -49,6 +49,21 @@ bool AItemPickupActor::Loot(UItemAsset* Item, int& OutAmount)
 	return false;
 }
 
+FVector AItemPickupActor::GetInterfaceLocation()
+{
+	return GetActorLocation();
+}
+
+bool AItemPickupActor::IsAbleToInteract()
+{
+	return !Looted;
+}
+
+FText AItemPickupActor::GetInteractionName()
+{
+	return FText::FromString(GetName());
+}
+
 void AItemPickupActor::Tick(float DeltaTime)
 {
 	if (!Looted) return;
@@ -71,5 +86,5 @@ void AItemPickupActor::ItemsEmptied()
 {
 	Looted = true;
 	if (DestroyOnLooted) SetActorTickEnabled(true);
-	if (Overlapping.Contains(this)) Overlapping.Remove(this);
+	// if (Overlapping.Contains(this)) Overlapping.Remove(this);
 }

@@ -18,9 +18,11 @@ class GOINGACTION_API ABaseInteractableActor : public AActor, public IInteractab
 public:	
 	ABaseInteractableActor();
 
-	virtual void Interact_Implementation(AGoingActionCharacter* Character) override;
+	virtual void Interact(AGoingActionCharacter* Character) override;
 
-	static TArray<ABaseInteractableActor*> Overlapping;
+	virtual FVector GetInterfaceLocation() override;
+	virtual bool IsAbleToInteract() override;
+	virtual FText GetInteractionName() override;
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;

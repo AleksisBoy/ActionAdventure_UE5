@@ -11,6 +11,13 @@ void ANPCController::BeginPlay()
 {
     Super::BeginPlay();
 
+    //bool bSuccess = false;
+    //UBlackboardComponent* BlackboardComp = Blackboard;
+    //if (BehaviorTree->BlackboardAsset && (Blackboard == nullptr || Blackboard->IsCompatibleWith(BehaviorTree->BlackboardAsset) == false))
+    //{
+    //    bSuccess = UseBlackboard(BehaviorTree->BlackboardAsset, BlackboardComp);
+    //}
+
     if (BehaviorTree)
     {
         RunBehaviorTree(BehaviorTree);

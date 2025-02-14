@@ -16,7 +16,11 @@ public:
 	AEnemy();
 
 	// IHealth
-	virtual void GetHit_Implementation(float Damage, FVector HitLocation) override;
+	virtual void GetHit(float Damage, FVector HitLocation) override;
+	virtual ELoyalty GetLoyalty() override;
+	virtual FVector GetInterfaceLocation() override;
+	virtual bool TakeTokens(int Tokens) override;
+	virtual void ReturnTokens(int Tokens) override;
 
 	virtual void Tick(float DeltaTime) override;
 

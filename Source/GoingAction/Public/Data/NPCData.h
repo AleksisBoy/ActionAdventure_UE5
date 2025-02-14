@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Interfaces/Health.h"
 #include "NPCData.generated.h"
 
 class ULocationData;
@@ -26,9 +27,12 @@ struct FNPCScheduleEvent
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float EndTime;    
-
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	ENPCActivityType Activity; 
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float ActivityWaitTime;
 
 	// change to data asset of location, place that can be chosen from editor and will point to the place on the 
 	// map where this activity can be done
@@ -44,6 +48,12 @@ class GOINGACTION_API UNPCData : public UDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "NPC Data")
 	FText Name;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "NPC Data")
+	float BaseHealth = 100.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "NPC Data")
+	ELoyalty Loyalty;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "NPC Data")
 	TArray<FNPCScheduleEvent> Schedule;

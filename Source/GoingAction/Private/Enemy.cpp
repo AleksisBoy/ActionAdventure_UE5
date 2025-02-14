@@ -26,7 +26,26 @@ void AEnemy::EndPlay(const EEndPlayReason::Type Reason)
 	if (Active.Contains(this)) Active.Remove(this);
 }
 
-void AEnemy::GetHit_Implementation(float Damage, FVector HitLocation)
+void AEnemy::GetHit(float Damage, FVector HitLocation)
+{
+}
+
+ELoyalty AEnemy::GetLoyalty()
+{
+	return ELoyalty();
+}
+
+FVector AEnemy::GetInterfaceLocation()
+{
+	return FVector();
+}
+
+bool AEnemy::TakeTokens(int Tokens)
+{
+	return false;
+}
+
+void AEnemy::ReturnTokens(int Tokens)
 {
 }
 
