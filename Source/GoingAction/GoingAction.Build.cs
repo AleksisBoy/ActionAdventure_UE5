@@ -9,6 +9,6 @@ public class GoingAction : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", 
-			"InputCore", "EnhancedInput", "UMG", "Slate"});
+			"InputCore", "EnhancedInput", "UMG", "Slate", "GameplayTags"});
 	}
 }

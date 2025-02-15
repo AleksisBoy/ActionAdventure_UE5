@@ -32,6 +32,7 @@ public:
 	virtual bool TakeTokens(int Tokens) override;
 	virtual void ReturnTokens(int Tokens) override;
 
+	virtual bool TryFindCombatTarget();
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
@@ -52,7 +53,11 @@ protected:
 	virtual void Die();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	int AttackTokens = 1;
+	int MyAttackTokens = 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Combat")
+	TScriptInterface<IHealth> CurrentTarget = nullptr;
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 

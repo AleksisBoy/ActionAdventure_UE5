@@ -23,23 +23,8 @@ EBTNodeResult::Type UBTTask_FindCombatTarget::ExecuteTask(UBehaviorTreeComponent
 	AAIController* Controller = OwnerComp.GetAIOwner();
 	if (ANonPlayableCharacter* NPC = Cast<ANonPlayableCharacter>(Controller->GetPawn()))
 	{
-		if (UCombatSubsystem* CombatSub = GetWorld()->GetSubsystem<UCombatSubsystem>())
-		{
-			CombatSub->GetClosestTargetFor(NPC, 1);
-			return EBTNodeResult::Succeeded;
-		}
+		if (NPC->TryFindCombatTarget()) return EBTNodeResult::Succeeded;
 	}
-	/*if (ANonPlayableCharacter* NPC = Cast<ANonPlayableCharacter>(Controller->GetPawn()))
-	{
-		FNPCScheduleEvent Schedule = {};
-		int Index = 0;
-		if (NPC->GetCurrentSchedule(Schedule, Index))
-		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation", AWorldLocation::Get(Schedule.Location)->GetActorLocation());
-			OwnerComp.GetBlackboardComponent()->SetValueAsInt("CurrentScheduleIndex", Index);
-			return EBTNodeResult::Succeeded;
-		}
-	}*/
 	return EBTNodeResult::Failed;
 }
 

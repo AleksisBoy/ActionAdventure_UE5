@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Interfaces/Health.h"
+#include "GameplayTagContainer.h"
 #include "NPCData.generated.h"
 
 class ULocationData;
+class UBehaviorTree; 
 
 UENUM(Blueprintable, BlueprintType)
 enum class ENPCActivityType : uint8
@@ -57,4 +59,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "NPC Data")
 	TArray<FNPCScheduleEvent> Schedule;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC Combat Data")
+	UBehaviorTree* CombatSubTree;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC Combat Data")
+	FGameplayTag CombatSubTreeTag;
 };

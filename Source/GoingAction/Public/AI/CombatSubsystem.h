@@ -18,8 +18,12 @@ public:
 	TArray<IHealth*> Members;
 
 	void StartCombat(IHealth* Initiator);
+	void RemoveMember(IHealth* Member);
 
 	IHealth* GetClosestTargetFor(IHealth* HealthInterface, int AttackTokens);
+
+	FVector GetCombatLocation();
+
 	virtual TStatId GetStatId() const override
 	{
 		return GetStatID();

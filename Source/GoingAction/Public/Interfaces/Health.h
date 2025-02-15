@@ -44,5 +44,4 @@ public:
 		if (!Main || !Other) return false;
 		return Main->GetLoyalty() != Other->GetLoyalty();
 	}
-protected:
 };

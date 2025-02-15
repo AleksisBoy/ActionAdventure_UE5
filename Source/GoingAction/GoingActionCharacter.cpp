@@ -19,7 +19,6 @@
 #include "Blueprint/UserWidget.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Application/NavigationConfig.h"
-//#include <Data/WeaponAsset.h>
 #include <Data/FoodAsset.h>
 #include "Interfaces/Interactable.h"
 #include "AI/CombatSubsystem.h"
@@ -166,7 +165,6 @@ void AGoingActionCharacter::Tick(float DeltaTime)
 
 void AGoingActionCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetName())
 	if (IInteractable* InteractableOverlapped = Cast<IInteractable>(OtherActor))
 	{
 		OverlappingInteractables.AddUnique(InteractableOverlapped);

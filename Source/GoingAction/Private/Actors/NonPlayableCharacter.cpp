@@ -63,15 +63,26 @@ ELoyalty ANonPlayableCharacter::GetLoyalty()
 
 bool ANonPlayableCharacter::TakeTokens(int Tokens)
 {
-	if (AttackTokens < Tokens) return false;
+	if (MyAttackTokens < Tokens) return false;
 
-	AttackTokens -= Tokens;
+	MyAttackTokens -= Tokens;
 	return true;
 }
 
 void ANonPlayableCharacter::ReturnTokens(int Tokens)
 {
-	AttackTokens += Tokens;
+	MyAttackTokens += Tokens;
+}
+
+bool ANonPlayableCharacter::TryFindCombatTarget()
+{
+	if (UCombatSubsystem* CombatSub = GetWorld()->GetSubsystem<UCombatSubsystem>())
+	{
+		IHealth* CombatTarget = CombatSub->GetClosestTargetFor(this, 1);
+		CurrentTarget.SetInterface(CombatTarget);
+		return CombatTarget != nullptr;
+	}
+	return false;
 }
 
 
@@ -82,6 +93,10 @@ void ANonPlayableCharacter::BeginPlay()
 	if (!NPCData) { UE_LOG(LogTemp, Error, TEXT("NO DATA FOR %s"), *GetName()); return; }
 
 	Controller = Cast<ANPCController>(GetController());
+	if (Controller && NPCData->CombatSubTree)
+	{
+		Controller->SetCombatSubTree(NPCData->CombatSubTreeTag, NPCData->CombatSubTree);
+	}
 
 	InteractionBox->OnComponentBeginOverlap.AddDynamic(this, &ANonPlayableCharacter::OnInteractionOverlapBegin);
 	InteractionBox->OnComponentEndOverlap.AddDynamic(this, &ANonPlayableCharacter::OnInteractionOverlapEnd);

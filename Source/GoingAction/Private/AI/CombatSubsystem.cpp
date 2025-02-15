@@ -12,6 +12,14 @@ void UCombatSubsystem::StartCombat(IHealth* Initiator)
 	Members.AddUnique(Initiator);
 }
 
+void UCombatSubsystem::RemoveMember(IHealth* Member)
+{
+	if (Members.Contains(Member))
+	{
+		Members.Remove(Member);
+	}
+}
+
 IHealth* UCombatSubsystem::GetClosestTargetFor(IHealth* HealthInterface, int AttackTokens)
 {
 	if (Members.Num() == 0) return nullptr;
@@ -33,6 +41,18 @@ IHealth* UCombatSubsystem::GetClosestTargetFor(IHealth* HealthInterface, int Att
 		}
 	}
 	return nullptr;
+}
+
+FVector UCombatSubsystem::GetCombatLocation()
+{
+	if (Members.Num() == 0) return FVector();
+
+	FVector CombatLocation;
+	for (IHealth* Member : Members)
+	{
+		CombatLocation += Member->GetInterfaceLocation();
+	}
+	return CombatLocation / Members.Num();
 }
 
 void UCombatSubsystem::Tick(float DeltaTime)
