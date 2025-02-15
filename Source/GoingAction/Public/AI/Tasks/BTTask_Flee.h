@@ -14,6 +14,9 @@ class GOINGACTION_API UBTTask_Flee : public UBTTaskNode
 public:
 	UPROPERTY(EditAnywhere, Category = "Flee")
 	float FleeDistance = 1000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Flee")
+	float FleeSpeed = 600.f;
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 };

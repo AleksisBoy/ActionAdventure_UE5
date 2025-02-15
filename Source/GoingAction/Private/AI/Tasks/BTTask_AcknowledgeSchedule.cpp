@@ -21,6 +21,7 @@ EBTNodeResult::Type UBTTask_AcknowledgeSchedule::ExecuteTask(UBehaviorTreeCompon
 		{
 			OwnerComp.GetBlackboardComponent()->SetValueAsVector("TargetLocation", AWorldLocation::Get(Schedule.Location)->GetActorLocation());
 			OwnerComp.GetBlackboardComponent()->SetValueAsInt("CurrentScheduleIndex", Index);
+			NPC->SetWalkSpeed(150.f);
 			return EBTNodeResult::Succeeded;
 		}
 	}

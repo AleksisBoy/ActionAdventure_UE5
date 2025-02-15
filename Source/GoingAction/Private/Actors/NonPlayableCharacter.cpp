@@ -6,6 +6,7 @@
 #include "Data/NPCData.h"
 #include "WorldInfo.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -83,6 +84,11 @@ bool ANonPlayableCharacter::TryFindCombatTarget()
 		return CombatTarget != nullptr;
 	}
 	return false;
+}
+
+void ANonPlayableCharacter::SetWalkSpeed(float Speed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
 

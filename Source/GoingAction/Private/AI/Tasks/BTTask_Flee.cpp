@@ -31,7 +31,10 @@ EBTNodeResult::Type UBTTask_Flee::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 
 		DirectionToCombat.Normalize();
 		Controller->MoveToLocation(PawnLocation + -DirectionToCombat * FleeDistance);
-
+		if (ANonPlayableCharacter* NPC = Cast<ANonPlayableCharacter>(Controller->GetPawn()))
+		{
+			NPC->SetWalkSpeed(FleeSpeed);
+		}
 		return EBTNodeResult::Succeeded;
 		/*UNavigationSystemV1* NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 		if (!NavSystem)

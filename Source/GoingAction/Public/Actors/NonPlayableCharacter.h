@@ -33,6 +33,8 @@ public:
 	virtual void ReturnTokens(int Tokens) override;
 
 	virtual bool TryFindCombatTarget();
+
+	void SetWalkSpeed(float Speed);
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;

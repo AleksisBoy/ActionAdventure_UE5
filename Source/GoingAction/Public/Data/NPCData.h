@@ -9,7 +9,8 @@
 #include "NPCData.generated.h"
 
 class ULocationData;
-class UBehaviorTree; 
+class UBehaviorTree;
+class UAnimMontage;
 
 UENUM(Blueprintable, BlueprintType)
 enum class ENPCActivityType : uint8
@@ -40,6 +41,9 @@ struct FNPCScheduleEvent
 	// map where this activity can be done
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	ULocationData* Location;  // Where to perform the activity
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UAnimMontage* ActivityAnimation;
 };
 
 UCLASS(Blueprintable, BlueprintType)
