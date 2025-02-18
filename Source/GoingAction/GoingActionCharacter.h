@@ -67,6 +67,12 @@ class AGoingActionCharacter : public ACharacter, public IHealth
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SprintAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ToggleWalkAction;
+
 public:
 	AGoingActionCharacter();
 
@@ -123,6 +129,10 @@ protected:
 
 	void Interact(const FInputActionValue& Value);
 
+	void Sprint(const FInputActionValue& Value);
+
+	void ToggleWalk(const FInputActionValue& Value);
+
 protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
@@ -153,12 +163,33 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	int AttackTokens = 1;
+
+	// Movement
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement")
+	float WalkSpeed = 300.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement")
+	float JogSpeed = 600.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement")
+	float SprintSpeed = 800.f;
+	
+	float CurrentSpeed = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Character Movement")
+	bool IsWalking = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Character Movement")
+	bool IsSprinting = false;
+
+	void UpdateSpeed();
 private:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))
 	AActor* CurrentlyLocked = nullptr;
 
 	APlayerController* PlayerController = nullptr;
+	UCharacterMovementComponent* CharacterMovement = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Character Stats", meta = (AllowPrivateAccess = "true"))
 	float Defense = 0.f;

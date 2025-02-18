@@ -76,6 +76,11 @@ void AGoingActionCharacter::BeginPlay()
 	{
 		CombatSub->StartCombat(this);
 	}
+	CharacterMovement = GetComponentByClass<UCharacterMovementComponent>();
+	if (CharacterMovement)
+	{
+		UpdateSpeed();
+	}
 
 	// Turn off UI Tab and Key navigation
 	FNavigationConfig& NavigationConfig = *FSlateApplication::Get().GetNavigationConfig();
@@ -184,6 +189,14 @@ void AGoingActionCharacter::UpdateStats()
 	Defense = Inventory->GetEquippedArmorDefense();
 }
 
+void AGoingActionCharacter::UpdateSpeed()
+{
+	if (IsSprinting) CurrentSpeed = SprintSpeed;
+	else CurrentSpeed = IsWalking ? WalkSpeed : JogSpeed;
+
+	CharacterMovement->MaxWalkSpeed = CurrentSpeed;
+}
+
 void AGoingActionCharacter::FindInteractableInFront()
 {
 	float MaximumDot = -1.f;
@@ -275,6 +288,9 @@ void AGoingActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 		EnhancedInputComponent->BindAction(CameraLockAction, ETriggerEvent::Triggered, this, &AGoingActionCharacter::TryLockCamera);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AGoingActionCharacter::Interact);
+	
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AGoingActionCharacter::Sprint);
+		EnhancedInputComponent->BindAction(ToggleWalkAction, ETriggerEvent::Triggered, this, &AGoingActionCharacter::ToggleWalk);
 	}
 	else
 	{
@@ -381,4 +397,16 @@ void AGoingActionCharacter::Interact(const FInputActionValue& Value)
 	{
 		InteractableInFront->Interact(this);
 	}
+}
+
+void AGoingActionCharacter::Sprint(const FInputActionValue& Value)
+{
+	IsSprinting = !IsSprinting;
+	UpdateSpeed();
+}
+
+void AGoingActionCharacter::ToggleWalk(const FInputActionValue& Value)
+{
+	IsWalking = !IsWalking;
+	UpdateSpeed();
 }

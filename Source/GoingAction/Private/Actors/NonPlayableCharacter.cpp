@@ -11,6 +11,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AI/CombatSubsystem.h"
+#include "GoingAction/GoingActionCharacter.h"
 
 ANonPlayableCharacter::ANonPlayableCharacter() : Super()
 {
@@ -29,6 +30,8 @@ ANonPlayableCharacter::ANonPlayableCharacter() : Super()
 
 void ANonPlayableCharacter::Interact(AGoingActionCharacter* Character)
 {
+	Controller->GetBlackboardComponent()->SetValueAsBool("InDialogue", true);
+	Controller->GetBlackboardComponent()->SetValueAsVector("TargetLocation", Character->GetActorLocation());
 }
 
 FVector ANonPlayableCharacter::GetInterfaceLocation()
@@ -121,13 +124,13 @@ void ANonPlayableCharacter::OnInteractionOverlapBegin(UPrimitiveComponent* Overl
 	// check if it is a player 
 	if (OtherActor == this) return;
 
-	Controller->GetBlackboardComponent()->SetValueAsBool("InCombat", true);
+	//Controller->GetBlackboardComponent()->SetValueAsBool("InCombat", true);
 
-	if (UCombatSubsystem* CombatSub = GetWorld()->GetSubsystem<UCombatSubsystem>())
-	{
-		CombatSub->StartCombat(this);
-	}
-	UE_LOG(LogTemp, Warning, TEXT("ADDED"));
+	//if (UCombatSubsystem* CombatSub = GetWorld()->GetSubsystem<UCombatSubsystem>())
+	//{
+	//	CombatSub->StartCombat(this);
+	//}
+	//UE_LOG(LogTemp, Warning, TEXT("ADDED"));
 	//Overlapping.AddUnique(this);
 }
 void ANonPlayableCharacter::OnInteractionOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
