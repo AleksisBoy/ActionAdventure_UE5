@@ -11,6 +11,7 @@
 struct FNPCScheduleEvent;
 class UBoxComponent;
 class ANPCController;
+class UDialogueAsset;
 
 UCLASS(Blueprintable, BlueprintType)
 class GOINGACTION_API ANonPlayableCharacter : public ACharacter, public IInteractable, public IHealth
@@ -60,6 +61,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Combat")
 	TScriptInterface<IHealth> CurrentTarget = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "NPC")
+	UDialogueAsset* NPCDialogue = nullptr;
 public:	
 	virtual void Tick(float DeltaTime) override;
 

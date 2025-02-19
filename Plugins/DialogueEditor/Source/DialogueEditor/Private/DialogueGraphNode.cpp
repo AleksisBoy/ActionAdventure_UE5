@@ -30,7 +30,7 @@ void UDialogueGraphNode::GetNodeContextMenuActions(UToolMenu* Menu, UGraphNodeCo
 		FUIAction(FExecuteAction::CreateLambda(
 			[Node]() 
 			{
-				Node->GetDialogueNodeInfo()->DialogueResponses.Add(FText::FromString(TEXT("Response")));
+				Node->GetDialogueNodeInfo()->DialogueResponses.Add(FDialogueResponse(FText::FromString(TEXT("Response"))));
 				Node->SyncPinsWithResponses();
 
 				Node->GetGraph()->NotifyGraphChanged();
@@ -93,9 +93,9 @@ UEdGraphPin* UDialogueGraphNode::CreateDefaultInputPin()
 
 void UDialogueGraphNode::CreateDefaultOutputPins()
 {
-	FString DefaultResponse = TEXT("Continue");
-	CreateDialoguePin(EEdGraphPinDirection::EGPD_Output, FName(DefaultResponse));
-	GetDialogueNodeInfo()->DialogueResponses.Add(FText::FromString(DefaultResponse));
+	FDialogueResponse DefaultResponse;
+	CreateDialoguePin(EEdGraphPinDirection::EGPD_Output, FName(DefaultResponse.Text.ToString()));
+	GetDialogueNodeInfo()->DialogueResponses.Add(DefaultResponse);
 }
 void UDialogueGraphNode::SyncPinsWithResponses()
 {
@@ -111,15 +111,15 @@ void UDialogueGraphNode::SyncPinsWithResponses()
 	while (NumInfoPins > NumGraphNodePins)
 	{
 		CreateDialoguePin(EEdGraphPinDirection::EGPD_Output,
-			FName(nodeInfo->DialogueResponses[NumGraphNodePins].ToString())
+			FName(nodeInfo->DialogueResponses[NumGraphNodePins].Text.ToString())
 		);
 		NumGraphNodePins++;
 	}
 
 	int Index = 1;
-	for (const FText& Option : nodeInfo->DialogueResponses)
+	for (const FDialogueResponse& Option : nodeInfo->DialogueResponses)
 	{
-		GetPinAt(Index)->PinName = FName(Option.ToString());
+		GetPinAt(Index)->PinName = FName(Option.Text.ToString());
 		Index++;
 	}
 }

@@ -22,6 +22,9 @@ public:
 	
 	UPROPERTY()
 	UDialogueRuntimePin* Connection = nullptr;
+	
+	UPROPERTY()
+	class UDialogueRuntimeNode* Parent = nullptr;
 
 };
 

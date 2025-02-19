@@ -12,6 +12,9 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AI/CombatSubsystem.h"
 #include "GoingAction/GoingActionCharacter.h"
+#include "Game/ActionGameInstance.h"
+#include "Actors/DialogueManager.h"
+#include "DialogueAsset.h"
 
 ANonPlayableCharacter::ANonPlayableCharacter() : Super()
 {
@@ -30,8 +33,14 @@ ANonPlayableCharacter::ANonPlayableCharacter() : Super()
 
 void ANonPlayableCharacter::Interact(AGoingActionCharacter* Character)
 {
+	UActionGameInstance* GameInstance = Cast<UActionGameInstance>(GetGameInstance());
+	if (!GameInstance || NPCDialogue == nullptr) return;
+	
+	GameInstance->GetDialogueManager()->PlayDialogue(NPCDialogue, (APlayerController*)Character->Controller);
+
 	Controller->GetBlackboardComponent()->SetValueAsBool("InDialogue", true);
 	Controller->GetBlackboardComponent()->SetValueAsVector("TargetLocation", Character->GetActorLocation());
+
 }
 
 FVector ANonPlayableCharacter::GetInterfaceLocation()
@@ -42,7 +51,7 @@ FVector ANonPlayableCharacter::GetInterfaceLocation()
 bool ANonPlayableCharacter::IsAbleToInteract()
 {
 	// Add logic
-	return true;
+	return NPCDialogue != nullptr;
 }
 
 FText ANonPlayableCharacter::GetInteractionName()

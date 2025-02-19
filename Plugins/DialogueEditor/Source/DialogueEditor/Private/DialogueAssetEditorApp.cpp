@@ -125,6 +125,7 @@ void DialogueAssetEditorApp::UpdateWorkingAssetFromGraph()
 			UDialogueRuntimePin* RuntimePin = NewObject<UDialogueRuntimePin>(RuntimeNode);
 			RuntimePin->PinName = Pin->PinName;
 			RuntimePin->PinID = Pin->PinId;
+			RuntimePin->Parent = RuntimeNode;
 
 			if (Pin->HasAnyConnections() && Pin->Direction == EEdGraphPinDirection::EGPD_Output)
 			{

@@ -26,18 +26,20 @@ public class DialogueEditorRuntime : ModuleRules
 			new string[]
 			{
 				"Core",
+                "GoingAction"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
-			
-		
+
+		//PublicIncludePathModuleNames.Add("GoingAction");
+
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
+				"SlateCore"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

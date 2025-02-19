@@ -7,7 +7,7 @@
 
 EBTNodeResult::Type UBTTask_LookAtTargetLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	UE_LOG(LogTemp, Warning, TEXT("LOOK AT"));
+	//UE_LOG(LogTemp, Warning, TEXT("LOOK AT"));
 	FVector TargetLocation = OwnerComp.GetBlackboardComponent()->GetValueAsVector(FName("TargetLocation"));
 	AActor* Self = OwnerComp.GetOwner();
 	if (!Self) return EBTNodeResult::Failed;
@@ -21,8 +21,8 @@ EBTNodeResult::Type UBTTask_LookAtTargetLocation::ExecuteTask(UBehaviorTreeCompo
 	DirectionForward.Normalize();
 
 	float Dot = FVector::DotProduct(DirectionForward, DirectionToTarget);
-	UE_LOG(LogTemp, Warning, TEXT("DOT: %f"), Dot);
-	UE_LOG(LogTemp, Warning, TEXT("Delta: %f"), OwnerComp.GetAccumulatedTickDeltaTime());
+	//UE_LOG(LogTemp, Warning, TEXT("DOT: %f"), Dot);
+	//UE_LOG(LogTemp, Warning, TEXT("Delta: %f"), OwnerComp.GetAccumulatedTickDeltaTime());
 	if (Dot < MinDot)
 	{
 		//FQuat LookAtRotation = FRotationMatrix::MakeFromXY(DirectionToTarget, ).ToQuat();
