@@ -7,6 +7,7 @@
 #include "DialogueGraphNode.h"
 #include "DialogueGraphNodeStart.h"
 #include "DialogueGraphNodeEnd.h"
+#include "DialogueGraphNodeReturn.h"
 #include "DialogueNodeInfo.h"
 
 DEFINE_LOG_CATEGORY_STATIC(DialogueAppSub, Log, All);
@@ -127,7 +128,8 @@ void DialogueAssetEditorApp::UpdateWorkingAssetFromGraph()
 			RuntimePin->PinID = Pin->PinId;
 			RuntimePin->Parent = RuntimeNode;
 
-			if (Pin->HasAnyConnections() && Pin->Direction == EEdGraphPinDirection::EGPD_Output)
+			if (Pin->HasAnyConnections())
+			//if (Pin->HasAnyConnections() && Pin->Direction == EEdGraphPinDirection::EGPD_Output)
 			{
 				std::pair<FGuid, FGuid> Connection = std::make_pair(Pin->PinId, Pin->LinkedTo[0]->PinId);
 				Connections.Add(Connection);
@@ -185,6 +187,10 @@ void DialogueAssetEditorApp::UpdateEditorGraphFromWorkingAsset()
 		{
 			NewNode = NewObject<UDialogueGraphNodeEnd>(WorkingGraph);
 		}
+		else if (RuntimeNode->NodeType == EDialogueNodeType::Return)
+		{
+			NewNode = NewObject<UDialogueGraphNodeReturn>(WorkingGraph);
+		}
 		else
 		{
 			UE_LOG(DialogueAppSub, Error, TEXT("DialogueAssetEditorApp::UpdateEditorGraphFromWorkingAsset: Unknown node type"));
@@ -205,26 +211,26 @@ void DialogueAssetEditorApp::UpdateEditorGraphFromWorkingAsset()
 
 		if (RuntimeNode->InputPin != nullptr)
 		{
-			UDialogueRuntimePin* Pin = RuntimeNode->InputPin;
-			UEdGraphPin* UIPin = NewNode->CreateDialoguePin(EEdGraphPinDirection::EGPD_Input, Pin->PinName);
-			UIPin->PinId = Pin->PinID;
+			UDialogueRuntimePin* InputPin = RuntimeNode->InputPin;
+			UEdGraphPin* UIPin = NewNode->CreateDialoguePin(EEdGraphPinDirection::EGPD_Input, InputPin->PinName);
+			UIPin->PinId = InputPin->PinID;
 
-			if (Pin->Connection != nullptr)
+			if (InputPin->Connection != nullptr)
 			{
-				Connections.Add(std::make_pair(Pin->PinID, Pin->Connection->PinID));
+				Connections.Add(std::make_pair(InputPin->PinID, InputPin->Connection->PinID));
 			}
-			IdToPinMap.Add(Pin->PinID, UIPin);
+			IdToPinMap.Add(InputPin->PinID, UIPin);
 		}
-		for (UDialogueRuntimePin* Pin : RuntimeNode->OutputPins)
+		for (UDialogueRuntimePin* OutputPin : RuntimeNode->OutputPins)
 		{
-			UEdGraphPin* UIPin = NewNode->CreateDialoguePin(EEdGraphPinDirection::EGPD_Output, Pin->PinName);
-			UIPin->PinId = Pin->PinID;
+			UEdGraphPin* UIPin = NewNode->CreateDialoguePin(EEdGraphPinDirection::EGPD_Output, OutputPin->PinName);
+			UIPin->PinId = OutputPin->PinID;
 
-			if (Pin->Connection != nullptr)
+			if (OutputPin->Connection != nullptr)
 			{
-				Connections.Add(std::make_pair(Pin->PinID, Pin->Connection->PinID));
+				Connections.Add(std::make_pair(OutputPin->PinID, OutputPin->Connection->PinID));
 			}
-			IdToPinMap.Add(Pin->PinID, UIPin);
+			IdToPinMap.Add(OutputPin->PinID, UIPin);
 		}
 
 		WorkingGraph->AddNode(NewNode, true, true);

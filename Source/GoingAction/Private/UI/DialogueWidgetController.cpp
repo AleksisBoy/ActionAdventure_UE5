@@ -7,15 +7,17 @@
 #include "UI/DialogueResponseButtonController.h"
 #include "Components/VerticalBox.h"
 #include "Utility/FactSystem.h"
+#include "Actors/DialogueManager.h"
 
-void UDialogueWidgetController::SetDialogue(FText Text)
+void UDialogueWidgetController::SetDialogue(FText Text, ADialogueManager* Manager)
 {
-	UE_LOG(LogTemp, Warning, TEXT("SET DIALGOEU"));
 	DialogueText->SetText(Text);
+	DialogueManager = Manager;
 }
 
 void UDialogueWidgetController::SelectResponseIndex(int Index)
 {
+	DialogueManager->ChooseResponseIndex(Index);
 }
 
 void UDialogueWidgetController::UpdateResponses(TArray<FDialogueResponse> Responses)
@@ -27,7 +29,7 @@ void UDialogueWidgetController::UpdateResponses(TArray<FDialogueResponse> Respon
 		return;
 	}
 
-	ResponsesBox->ClearChildren();
+	ClearResponses();
 	for (int i = 0; i < Responses.Num(); i++)
 	{
 		if (!FactSystem->CheckFact(Responses[i].Fact)) continue;
@@ -36,4 +38,18 @@ void UDialogueWidgetController::UpdateResponses(TArray<FDialogueResponse> Respon
 		ResponseButton->SetResponse(this, Responses[i].Text, i);
 		ResponsesBox->AddChild(ResponseButton);
 	}
+}
+
+void UDialogueWidgetController::ClearResponses()
+{
+	ResponsesBox->ClearChildren();
+	CollectGarbage(EObjectFlags::RF_NoFlags);
+}
+
+bool UDialogueWidgetController::TrySkipDialogue()
+{
+	if (!DialogueManager) return false;
+
+	DialogueManager->SkipDialogue();
+	return true;
 }

@@ -51,6 +51,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	USoundBase* DialogueAudio;
+	
+	UPROPERTY(EditAnywhere)
+	float Duration;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FDialogueResponse> DialogueResponses;
@@ -58,5 +61,15 @@ public:
 	FText GetSpeakerDialogue()
 	{
 		return FText::Join(FText::FromString(": "), Speaker, DialogueText);
+	}
+
+	// Get the duration of the node, picks audio duration as top priority
+	float GetRealDuration()
+	{
+		if (DialogueAudio)
+		{
+			return DialogueAudio->Duration;
+		}
+		return Duration;
 	}
 };

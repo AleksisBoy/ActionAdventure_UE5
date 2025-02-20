@@ -10,6 +10,7 @@ class UDialogueResponseButtonController;
 class UTextBlock;
 struct FDialogueResponse;
 class UVerticalBox;
+class ADialogueManager;
 
 UCLASS()
 class GOINGACTION_API UDialogueWidgetController : public UUserWidget
@@ -17,10 +18,13 @@ class GOINGACTION_API UDialogueWidgetController : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void SetDialogue(FText Text);
+	void SetDialogue(FText Text, ADialogueManager* Manager);
 	void SelectResponseIndex(int Index);
 
 	void UpdateResponses(TArray<FDialogueResponse> Responses);
+	void ClearResponses();
+
+	UFUNCTION(BlueprintCallable)
 	bool TrySkipDialogue();
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
@@ -34,6 +38,7 @@ public:
 private:
 
 	bool IsSpeaking = false;
+	ADialogueManager* DialogueManager = nullptr;
 
 	TArray<UDialogueResponseButtonController*> CurrentResponseButtons;
 };

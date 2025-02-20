@@ -8,5 +8,6 @@ enum class EDialogueNodeType
 	Unknown,
 	Start,
 	Dialogue,
-	End
+	End,
+	Return
 };

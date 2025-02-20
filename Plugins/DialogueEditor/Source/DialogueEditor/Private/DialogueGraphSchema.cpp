@@ -2,6 +2,7 @@
 #include "DialogueGraphSchema.h"
 #include "DialogueGraphNode.h"
 #include "DialogueGraphNodeStart.h"
+#include "DialogueGraphNodeReturn.h"
 #include "DialogueGraphNodeEnd.h"
 #include "DialogueNodeInfo.h"
 
@@ -17,7 +18,18 @@ void UDialogueGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& Cont
 			0
 		)
 	);
-	
+
+	TSharedPtr<FNewNodeAction> NewReturnNodeAction
+	(
+		new FNewNodeAction(
+			UDialogueGraphNodeReturn::StaticClass(),
+			FText::FromString(TEXT("Nodes")),
+			FText::FromString(TEXT("New Return Node")),
+			FText::FromString(TEXT("Makes a new return node")),
+			0
+		)
+	);
+
 	TSharedPtr<FNewNodeAction> NewEndNodeAction
 	(
 		new FNewNodeAction(
@@ -28,8 +40,9 @@ void UDialogueGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& Cont
 			0
 		)
 	);
-
+	
 	ContextMenuBuilder.AddAction(NewDialogueNodeAction);
+	ContextMenuBuilder.AddAction(NewReturnNodeAction);
 	ContextMenuBuilder.AddAction(NewEndNodeAction);
 }
 

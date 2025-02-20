@@ -21,6 +21,8 @@ class GOINGACTION_API ANonPlayableCharacter : public ACharacter, public IInterac
 public:
 	ANonPlayableCharacter();
 
+	virtual void QuitDialogue();
+
 	// IInteractable
 	virtual void Interact(AGoingActionCharacter* Character) override;
 	virtual FVector GetInterfaceLocation() override;

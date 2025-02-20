@@ -31,16 +31,20 @@ ANonPlayableCharacter::ANonPlayableCharacter() : Super()
 	InteractionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
+void ANonPlayableCharacter::QuitDialogue()
+{
+	Controller->GetBlackboardComponent()->SetValueAsBool("InDialogue", false);
+}
+
 void ANonPlayableCharacter::Interact(AGoingActionCharacter* Character)
 {
 	UActionGameInstance* GameInstance = Cast<UActionGameInstance>(GetGameInstance());
 	if (!GameInstance || NPCDialogue == nullptr) return;
 	
-	GameInstance->GetDialogueManager()->PlayDialogue(NPCDialogue, (APlayerController*)Character->Controller);
+	GameInstance->GetDialogueManager()->PlayDialogue(NPCDialogue, (APlayerController*)Character->Controller, this);
 
 	Controller->GetBlackboardComponent()->SetValueAsBool("InDialogue", true);
 	Controller->GetBlackboardComponent()->SetValueAsVector("TargetLocation", Character->GetActorLocation());
-
 }
 
 FVector ANonPlayableCharacter::GetInterfaceLocation()

@@ -63,6 +63,23 @@ protected:
 	}
 };
 
+class SDialogueReturnGraphPin : public SGraphPin
+{
+public:
+	SLATE_BEGIN_ARGS(SDialogueEndGraphPin) {}
+	SLATE_END_ARGS()
+
+	void Construct(const FArguments& InArgs, UEdGraphPin* InGraphPinObj)
+	{
+		SGraphPin::Construct(SGraphPin::FArguments(), InGraphPinObj);
+	}
+protected:
+	virtual FSlateColor GetPinColor() const override
+	{
+		return FSlateColor(FLinearColor(0.949f, 0.788f, 0.122f));
+	}
+};
+
 struct FDialoguePinFactory : public FGraphPanelPinFactory
 {
 public:
@@ -80,6 +97,10 @@ public:
 		else if (FName(TEXT("EndPin")) == Pin->PinType.PinSubCategory)
 		{
 			return SNew(SDialogueEndGraphPin, Pin);
+		}
+		else if (FName(TEXT("ReturnPin")) == Pin->PinType.PinSubCategory)
+		{
+			return SNew(SDialogueReturnGraphPin, Pin);
 		}
 		return nullptr;
 	}
