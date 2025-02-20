@@ -4,12 +4,17 @@
 #include "Actors/DialogueManager.h"
 #include "Camera/CameraComponent.h"
 #include "DialogueNodeInfo.h"
+#include "DialogueImpactNodeInfo.h"
 #include "DialogueReturnNodeInfo.h"
 #include "Game/ActionGameInstance.h"	
 #include "UI/DialogueWidgetController.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/AudioComponent.h"
 #include "Actors/NonPlayableCharacter.h"
+#include "Utility/SaveInstance.h"
+#include "GoingAction/GoingActionCharacter.h"
+#include "Components/InventoryComponent.h"
+#include "Utility/FactSystem.h"
 
 ADialogueManager::ADialogueManager()
 {
@@ -45,7 +50,7 @@ void ADialogueManager::Tick(float DeltaTime)
 	}
 }
 
-void ADialogueManager::PlayDialogue(UDialogueAsset* DialogueAsset, APlayerController* PlayerController, ANonPlayableCharacter* talkingNPC)
+void ADialogueManager::PlayDialogue(UDialogueAsset* DialogueAsset, AGoingActionCharacter* PlayerCharacter, ANonPlayableCharacter* TalkingNPC)
 {
 	UActionGameInstance* GameInstance = Cast<UActionGameInstance>(GetGameInstance());
 	if (!GameInstance) return;
@@ -53,8 +58,8 @@ void ADialogueManager::PlayDialogue(UDialogueAsset* DialogueAsset, APlayerContro
 
 	SpeakingTime = 0.f;
 	CurrentDialogue = DialogueAsset;
-	CachedPlayerController = PlayerController;
-	TalkingNPC = talkingNPC;
+	CachedPlayerCharacter = PlayerCharacter;
+	CachedTalkingNPC = TalkingNPC;
 	for (UDialogueRuntimeNode* Node : CurrentDialogue->Graph->Nodes)
 	{
 		if (Node->NodeType == EDialogueNodeType::Start)
@@ -68,7 +73,9 @@ void ADialogueManager::PlayDialogue(UDialogueAsset* DialogueAsset, APlayerContro
 		UE_LOG(LogTemp, Error, TEXT("NO START NODE IN DIALOGUE ASSET"));
 		return;
 	}
-	AudioComponent->SetWorldLocation(PlayerController->GetPawn()->GetActorLocation());
+	AudioComponent->SetWorldLocation(PlayerCharacter->GetActorLocation());
+
+	APlayerController* PlayerController = (APlayerController*)PlayerCharacter->GetController();
 
 	// Create and display dialogue ui
 	if (CurrentDialogueUI == nullptr)
@@ -77,7 +84,7 @@ void ADialogueManager::PlayDialogue(UDialogueAsset* DialogueAsset, APlayerContro
 	}
 	CurrentDialogueUI->AddToViewport();
 
-	// Set player input mode
+	// Set player input mode UI
 	FInputModeUIOnly InputMode;
 	InputMode.SetWidgetToFocus(CurrentDialogueUI->GetCachedWidget());
 
@@ -95,6 +102,9 @@ void ADialogueManager::ChooseResponseIndex(int Index)
 		UE_LOG(LogTemp, Error, TEXT("Invalid response at index %d"), Index);
 		return;
 	}
+
+	// Store chosen Dialogue response as already heard
+	// ...
 
 	UDialogueRuntimePin* OutputPin = CurrentNode->OutputPins[Index];
 	if (OutputPin->Connection != nullptr)
@@ -129,6 +139,8 @@ void ADialogueManager::ChooseResponseIndex(int Index)
 		UDialogueReturnNodeInfo* ReturnInfo = Cast<UDialogueReturnNodeInfo>(CurrentNode->NodeInfo);
 		UDialogueRuntimeNode* ReturnalNode = CurrentNode;
 		int StepsBack = 0;
+
+		// Find previous dialogue node by StepsBack
 		while (StepsBack < ReturnInfo->StepsBack)
 		{
 			ReturnalNode = ReturnalNode->InputPin->Connection->Parent;
@@ -147,20 +159,51 @@ void ADialogueManager::ChooseResponseIndex(int Index)
 		CurrentDialogueInfo = Cast<UDialogueNodeInfo>(ReturnalNode->NodeInfo);
 		CurrentNode = ReturnalNode;
 		CurrentDialogueUI->UpdateResponses(CurrentDialogueInfo->DialogueResponses);
+		//CurrentDialogueInfo = nullptr; //???
+	}
+	// Next Node is Impact (Give player items, update facts, update quests, and continue instantly)
+	else if (CurrentNode->NodeType == EDialogueNodeType::Impact)
+	{
+		// Add items
+		UDialogueImpactNodeInfo* ImpactInfo = Cast<UDialogueImpactNodeInfo>(CurrentNode->NodeInfo);
+		for (FItemImpact& ItemImpact : ImpactInfo->ItemImpacts)
+		{
+			CachedPlayerCharacter->Inventory->TryAddItem(ItemImpact.Item, ItemImpact.Amount);
+			// item added ui popup? or have it made in inventory events
+		}
+
+		// Update facts
+		UFactSystem* FactSystem = GetGameInstance()->GetSubsystem<UFactSystem>();
+		if (FactSystem)
+		{
+			for (FFactImpact& FactImpact : ImpactInfo->FactImpacts)
+			{
+				FactSystem->UpdateFact(FactImpact.Fact, FactImpact.Value);
+			}
+		}
+		
+		// Update Quests
+		// ...
+
+		// Continue
+		ChooseResponseIndex(0);
 	}
 	// Next Node is End (Quit Dialogue)
 	else if (CurrentNode->NodeType == EDialogueNodeType::End)
 	{
 		CurrentDialogueUI->ClearResponses();
-		CurrentDialogueUI->RemoveFromViewport();
+		CurrentDialogueUI->RemoveFromParent();
+		CurrentDialogue = nullptr;
+		CurrentDialogueInfo = nullptr;
 
-		TalkingNPC->QuitDialogue();
+		CachedTalkingNPC->QuitDialogue();
 
 		// Set player input mode game
 		FInputModeGameOnly InputMode;
 
-		CachedPlayerController->SetInputMode(InputMode);
-		CachedPlayerController->bShowMouseCursor = false;
+		APlayerController* PlayerController = (APlayerController*)CachedPlayerCharacter->GetController();
+		PlayerController->SetInputMode(InputMode);
+		PlayerController->bShowMouseCursor = false;
 	}
 }
 
@@ -187,4 +230,3 @@ void ADialogueManager::OnFinishedSpeaking()
 	}
 	CurrentDialogueUI->UpdateResponses(CurrentDialogueInfo->DialogueResponses);
 }
-

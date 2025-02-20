@@ -22,6 +22,7 @@
 #include <Data/FoodAsset.h>
 #include "Interfaces/Interactable.h"
 #include "AI/CombatSubsystem.h"
+#include "Game/ActionGameInstance.h"
 
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -71,11 +72,16 @@ void AGoingActionCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	// Save/Load Interface
+	GetGameInstance<UActionGameInstance>()->AssignToSaving(this, true);
 
+	// DEBUG Combat 
 	if (UCombatSubsystem* CombatSub = GetWorld()->GetSubsystem<UCombatSubsystem>())
 	{
 		CombatSub->StartCombat(this);
 	}
+
+	// Movement Speed
 	CharacterMovement = GetComponentByClass<UCharacterMovementComponent>();
 	if (CharacterMovement)
 	{
@@ -97,34 +103,6 @@ void AGoingActionCharacter::BeginPlay()
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AGoingActionCharacter::OnOverlapBegin);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AGoingActionCharacter::OnOverlapEnd);
 }
-
-void AGoingActionCharacter::SaveGame(const FString& SlotName)
-{
-	USaveInstance* SaveInstance = Cast<USaveInstance>(UGameplayStatics::CreateSaveGameObject(USaveInstance::StaticClass()));
-
-	if (SaveInstance)
-	{
-		SaveInstance->AssignInventory(Inventory->GetItems());
-		SaveInstance->Health = Health;
-
-		UGameplayStatics::SaveGameToSlot(SaveInstance, SlotName, 0);
-	}
-}
-
-void AGoingActionCharacter::LoadGameData(const FString& SlotName)
-{
-	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
-	{
-		USaveInstance* LoadedGame = Cast<USaveInstance>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
-
-		if (LoadedGame)
-		{
-			Health = LoadedGame->Health;
-			Inventory->Load(LoadedGame->LoadInventory());
-		}
-	}
-}
-
 
 void AGoingActionCharacter::GetHit(float Damage, FVector HitLocation)
 {
@@ -157,6 +135,21 @@ void AGoingActionCharacter::ReturnTokens(int Tokens)
 {
 	AttackTokens += Tokens;
 }
+
+// Save/Load Interface ->
+void AGoingActionCharacter::SaveState(USaveInstance* SaveInstance)
+{
+	UE_LOG(LogTemp, Warning, TEXT("SAVING INSIDE CHARACTER"));
+	SaveInstance->AssignInventory(Inventory->GetItems());
+	SaveInstance->Health = Health;
+}
+
+void AGoingActionCharacter::LoadState(USaveInstance* SaveInstance)
+{
+	Inventory->Load(SaveInstance->LoadInventory());
+	Health = SaveInstance->Health;
+}
+// Save/Load Interface <-
 
 void AGoingActionCharacter::Die()
 {
@@ -409,4 +402,34 @@ void AGoingActionCharacter::ToggleWalk(const FInputActionValue& Value)
 {
 	IsWalking = !IsWalking;
 	UpdateSpeed();
+}
+
+
+// Deprecated
+void AGoingActionCharacter::SaveGame(const FString& SlotName)
+{
+	USaveInstance* SaveInstance = Cast<USaveInstance>(UGameplayStatics::CreateSaveGameObject(USaveInstance::StaticClass()));
+
+	if (SaveInstance)
+	{
+		SaveInstance->AssignInventory(Inventory->GetItems());
+		SaveInstance->Health = Health;
+
+		UGameplayStatics::SaveGameToSlot(SaveInstance, SlotName, 0);
+	}
+}
+
+// Deprecated
+void AGoingActionCharacter::LoadGameData(const FString& SlotName)
+{
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+	{
+		USaveInstance* LoadedGame = Cast<USaveInstance>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+
+		if (LoadedGame)
+		{
+			Health = LoadedGame->Health;
+			Inventory->Load(LoadedGame->LoadInventory());
+		}
+	}
 }

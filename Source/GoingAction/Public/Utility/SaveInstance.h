@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "Data/ItemAsset.h"
+#include "Utility/Fact.h"
 #include "SaveInstance.generated.h"
 
 
@@ -37,9 +38,17 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "SaveGame")
     float Health;
 
+    // Inventory
     UPROPERTY(BlueprintReadWrite, Category = "SaveGame")
     TArray<FItemSaved> Inventory;
 
     void AssignInventory(TArray<UItem*> ItemInstances);
     TArray<UItem*> LoadInventory();
+
+    // Dialogue
+    // ...
+    
+    // Facts
+    UPROPERTY()
+    TMap<uint8, bool> Facts;
 };

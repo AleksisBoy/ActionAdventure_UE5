@@ -9,5 +9,6 @@ enum class EDialogueNodeType
 	Start,
 	Dialogue,
 	End,
-	Return
+	Return,
+	Impact
 };

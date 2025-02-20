@@ -41,7 +41,7 @@ void ANonPlayableCharacter::Interact(AGoingActionCharacter* Character)
 	UActionGameInstance* GameInstance = Cast<UActionGameInstance>(GetGameInstance());
 	if (!GameInstance || NPCDialogue == nullptr) return;
 	
-	GameInstance->GetDialogueManager()->PlayDialogue(NPCDialogue, (APlayerController*)Character->Controller, this);
+	GameInstance->GetDialogueManager()->PlayDialogue(NPCDialogue, Character, this);
 
 	Controller->GetBlackboardComponent()->SetValueAsBool("InDialogue", true);
 	Controller->GetBlackboardComponent()->SetValueAsVector("TargetLocation", Character->GetActorLocation());

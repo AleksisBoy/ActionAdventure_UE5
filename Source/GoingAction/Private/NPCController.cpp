@@ -27,7 +27,7 @@ void ANPCController::BeginPlay()
     
     if (BTComp)
     {
-        UE_LOG(LogTemp, Warning, TEXT("FOund bt comp"));
+        //UE_LOG(LogTemp, Warning, TEXT("FOund bt comp"));
     }
 }
 

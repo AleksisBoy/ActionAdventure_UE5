@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DialogueAsset.h"
+#include "Interfaces/SaveLoad.h"
 #include "DialogueManager.generated.h"
 
 class UCameraComponent;
@@ -12,6 +13,8 @@ class UDialogueWidgetController;
 class UDialogueNodeInfo;
 class UAudioComponent;
 class ANonPlayableCharacter;
+class AGoingActionCharacter;
+class USaveInstance;
 
 UCLASS()
 class GOINGACTION_API ADialogueManager : public AActor
@@ -27,10 +30,11 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	void PlayDialogue(UDialogueAsset* DialogueAsset, APlayerController* PlayerController, ANonPlayableCharacter* talkingNPC);
+	void PlayDialogue(UDialogueAsset* DialogueAsset, AGoingActionCharacter* PlayerCharacter, ANonPlayableCharacter* TalkingNPC);
 	void ChooseResponseIndex(int Index);
 
 	void SkipDialogue();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* DialogueCamera = nullptr;
@@ -55,7 +59,7 @@ private:
 	float SpeakingTime = 0.f;
 	float CurrentDialogueDuration = 0.f;
 
-	ANonPlayableCharacter* TalkingNPC = nullptr;
 	UDialogueNodeInfo* CurrentDialogueInfo = nullptr;
-	APlayerController* CachedPlayerController = nullptr;
+	ANonPlayableCharacter* CachedTalkingNPC = nullptr;
+	AGoingActionCharacter* CachedPlayerCharacter = nullptr;
 };

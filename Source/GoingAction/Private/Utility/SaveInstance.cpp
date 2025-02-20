@@ -5,6 +5,7 @@
 
 void USaveInstance::AssignInventory(TArray<UItem*> ItemInstances)
 {
+	Inventory.Empty();
 	for (UItem* ItemInstance : ItemInstances)
 	{
 		FItemSaved Item = FItemSaved();

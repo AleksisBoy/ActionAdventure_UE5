@@ -24,13 +24,18 @@ struct FDialogueResponse
 
 	FDialogueResponse()
 	{
-
+		Text = FText::FromString(TEXT("Continue"));
+		Fact = EFact::DEFAULT_TRUE;
 	}
-	FDialogueResponse(const FText& InText) : Text(InText)
+	FDialogueResponse(const FText& InText)
 	{
+		Text = InText;
+		Fact = EFact::DEFAULT_TRUE;
 	}
-	FDialogueResponse(EFact InFact, const FText& InText) : Fact(InFact), Text(Text)
+	FDialogueResponse(EFact InFact, const FText& InText)
 	{
+		Fact = InFact;
+		Text = InText;
 	}
 };
 

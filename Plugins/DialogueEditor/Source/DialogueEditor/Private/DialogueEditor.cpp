@@ -12,6 +12,7 @@
 
 #define LOCTEXT_NAMESPACE "FDialogueEditorModule"
 
+// Dialogue
 class SDialogueGraphPin : public SGraphPin
 {
 public:
@@ -29,6 +30,7 @@ protected:
 	}
 };
 
+// Start
 class SDialogueStartGraphPin : public SGraphPin
 {
 public:
@@ -46,6 +48,7 @@ protected:
 	}
 };
 
+// End
 class SDialogueEndGraphPin : public SGraphPin
 {
 public:
@@ -63,10 +66,11 @@ protected:
 	}
 };
 
+// Return
 class SDialogueReturnGraphPin : public SGraphPin
 {
 public:
-	SLATE_BEGIN_ARGS(SDialogueEndGraphPin) {}
+	SLATE_BEGIN_ARGS(SDialogueReturnGraphPin) {}
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs, UEdGraphPin* InGraphPinObj)
@@ -77,6 +81,24 @@ protected:
 	virtual FSlateColor GetPinColor() const override
 	{
 		return FSlateColor(FLinearColor(0.949f, 0.788f, 0.122f));
+	}
+};
+
+// Impact
+class SDialogueImpactGraphPin : public SGraphPin
+{
+public:
+	SLATE_BEGIN_ARGS(SDialogueImpactGraphPin) {}
+	SLATE_END_ARGS()
+
+	void Construct(const FArguments& InArgs, UEdGraphPin* InGraphPinObj)
+	{
+		SGraphPin::Construct(SGraphPin::FArguments(), InGraphPinObj);
+	}
+protected:
+	virtual FSlateColor GetPinColor() const override
+	{
+		return FSlateColor(FLinearColor(0.4f, 0.4f, 0.4f));
 	}
 };
 
@@ -101,6 +123,10 @@ public:
 		else if (FName(TEXT("ReturnPin")) == Pin->PinType.PinSubCategory)
 		{
 			return SNew(SDialogueReturnGraphPin, Pin);
+		}
+		else if (FName(TEXT("ImpactPin")) == Pin->PinType.PinSubCategory)
+		{
+			return SNew(SDialogueImpactGraphPin, Pin);
 		}
 		return nullptr;
 	}

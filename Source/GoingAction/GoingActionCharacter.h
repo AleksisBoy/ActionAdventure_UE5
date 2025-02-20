@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "Interfaces/Health.h"
+#include "Interfaces/SaveLoad.h"
 #include "GoingActionCharacter.generated.h"
 
 //UENUM(Blueprintable, BlueprintType)
@@ -24,13 +25,14 @@ class UInventoryComponent;
 class ABaseInteractableActor;
 class AItemPickupActor;
 class UUserWidget;
+class USaveInstance;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractableChanged, TScriptInterface<IInteractable>, Interactable);
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class AGoingActionCharacter : public ACharacter, public IHealth
+class AGoingActionCharacter : public ACharacter, public IHealth, public ISaveLoad
 {
 	GENERATED_BODY()
 
@@ -113,6 +115,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 	float MaxHealth = 100.f;
+
+	// ISaveLoad
+	virtual void SaveState(USaveInstance* SaveInstance) override;
+	virtual void LoadState(USaveInstance* SaveInstance) override;
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Character")

@@ -3,6 +3,7 @@
 #include "DialogueGraphNode.h"
 #include "DialogueGraphNodeStart.h"
 #include "DialogueGraphNodeReturn.h"
+#include "DialogueGraphNodeImpact.h"
 #include "DialogueGraphNodeEnd.h"
 #include "DialogueNodeInfo.h"
 
@@ -29,6 +30,17 @@ void UDialogueGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& Cont
 			0
 		)
 	);
+	
+	TSharedPtr<FNewNodeAction> NewImpactNodeAction
+	(
+		new FNewNodeAction(
+			UDialogueGraphNodeImpact::StaticClass(),
+			FText::FromString(TEXT("Nodes")),
+			FText::FromString(TEXT("New Impact Node")),
+			FText::FromString(TEXT("Makes a new impact node")),
+			0
+		)
+	);
 
 	TSharedPtr<FNewNodeAction> NewEndNodeAction
 	(
@@ -43,6 +55,7 @@ void UDialogueGraphSchema::GetGraphContextActions(FGraphContextMenuBuilder& Cont
 	
 	ContextMenuBuilder.AddAction(NewDialogueNodeAction);
 	ContextMenuBuilder.AddAction(NewReturnNodeAction);
+	ContextMenuBuilder.AddAction(NewImpactNodeAction);
 	ContextMenuBuilder.AddAction(NewEndNodeAction);
 }
 

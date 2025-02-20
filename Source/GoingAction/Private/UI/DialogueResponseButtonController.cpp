@@ -11,6 +11,7 @@ void UDialogueResponseButtonController::SetResponse(UDialogueWidgetController* d
 	this->DialogueController = dialogueController;
 	ResponseText->SetText(Text);
 	ResponseIndex = Index;
+	//if (ResponseAlreadyHeard) ResponseText->SetColorAndOpacity(FLinearColor(0, 0, 0, 1));
 
 	ResponseButton->OnClicked.AddDynamic(this, &UDialogueResponseButtonController::OnResponseClicked);
 }

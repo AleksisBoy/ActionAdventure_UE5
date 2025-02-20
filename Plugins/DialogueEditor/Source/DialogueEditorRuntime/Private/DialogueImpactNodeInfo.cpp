@@ -1,0 +1,5 @@
+
+
+
+#include "DialogueImpactNodeInfo.h"
+

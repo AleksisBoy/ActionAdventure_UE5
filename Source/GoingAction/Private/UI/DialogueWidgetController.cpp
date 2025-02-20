@@ -33,6 +33,9 @@ void UDialogueWidgetController::UpdateResponses(TArray<FDialogueResponse> Respon
 	for (int i = 0; i < Responses.Num(); i++)
 	{
 		if (!FactSystem->CheckFact(Responses[i].Fact)) continue;
+		//bool ResponseAlreadyHeard = StoredResponsesMap.Contains(i) ? StoredResponsesMap[i] : false;
+		//if (!Responses[i].Repetative && ResponseAlreadyHeard) continue;
+
 
 		UDialogueResponseButtonController* ResponseButton = CreateWidget<UDialogueResponseButtonController>(this, ResponseButtonClass);
 		ResponseButton->SetResponse(this, Responses[i].Text, i);

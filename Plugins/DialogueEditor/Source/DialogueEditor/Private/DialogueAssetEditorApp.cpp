@@ -8,6 +8,7 @@
 #include "DialogueGraphNodeStart.h"
 #include "DialogueGraphNodeEnd.h"
 #include "DialogueGraphNodeReturn.h"
+#include "DialogueGraphNodeImpact.h"
 #include "DialogueNodeInfo.h"
 
 DEFINE_LOG_CATEGORY_STATIC(DialogueAppSub, Log, All);
@@ -190,6 +191,10 @@ void DialogueAssetEditorApp::UpdateEditorGraphFromWorkingAsset()
 		else if (RuntimeNode->NodeType == EDialogueNodeType::Return)
 		{
 			NewNode = NewObject<UDialogueGraphNodeReturn>(WorkingGraph);
+		}
+		else if (RuntimeNode->NodeType == EDialogueNodeType::Impact)
+		{
+			NewNode = NewObject<UDialogueGraphNodeImpact>(WorkingGraph);
 		}
 		else
 		{
