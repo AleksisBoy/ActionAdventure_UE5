@@ -73,6 +73,9 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
-Content/Characters/*
+Content/Characters/Mannequin_UE4*
+Content/Characters/Mannequins*
+
 Content/StarterContent/*
 /Builds
+/Content/ElfArden
