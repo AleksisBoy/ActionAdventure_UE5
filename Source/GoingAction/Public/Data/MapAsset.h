@@ -12,10 +12,10 @@ struct FMapPin
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector2D Position;
+	FVector2D Position = FVector2D::ZeroVector;;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture2D* Texture;
+	UTexture2D* Texture = nullptr;
 };
 
 UCLASS(Blueprintable, BlueprintType)

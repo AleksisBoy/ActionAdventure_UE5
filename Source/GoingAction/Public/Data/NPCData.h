@@ -26,24 +26,24 @@ struct FNPCScheduleEvent
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float StartTime;  
+	float StartTime = 0.f;  
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float EndTime;    
+	float EndTime = 0.f;    
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	ENPCActivityType Activity; 
+	ENPCActivityType Activity = ENPCActivityType::Eat; 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float ActivityWaitTime;
+	float ActivityWaitTime = 0.f;
 
 	// change to data asset of location, place that can be chosen from editor and will point to the place on the 
 	// map where this activity can be done
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	ULocationData* Location;  // Where to perform the activity
+	ULocationData* Location = nullptr;  // Where to perform the activity
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* ActivityAnimation;
+	UAnimMontage* ActivityAnimation = nullptr;
 };
 
 UCLASS(Blueprintable, BlueprintType)

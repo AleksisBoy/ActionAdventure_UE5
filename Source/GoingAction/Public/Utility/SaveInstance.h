@@ -15,7 +15,7 @@ struct FItemSaved
     GENERATED_BODY()
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-    UItemAsset* Asset;
+    UItemAsset* Asset = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int Stack = 0;

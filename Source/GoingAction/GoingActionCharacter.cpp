@@ -73,7 +73,13 @@ void AGoingActionCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// Save/Load Interface
-	GetGameInstance<UActionGameInstance>()->AssignToSaving(this, true);
+	UE_LOG(LogTemp, Warning, TEXT("TRYING TO ASSIGN SAVE CHARACTER"));
+	if (UActionGameInstance* GameInstance = GetGameInstance<UActionGameInstance>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ASSIGNING TO SAVE CHARACTER"));
+		GameInstance->AssignToSaving(this, true);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("CONTINUE CHARACTER"));
 
 	// DEBUG Combat 
 	if (UCombatSubsystem* CombatSub = GetWorld()->GetSubsystem<UCombatSubsystem>())
@@ -146,6 +152,9 @@ void AGoingActionCharacter::SaveState(USaveInstance* SaveInstance)
 
 void AGoingActionCharacter::LoadState(USaveInstance* SaveInstance)
 {
+	if (SaveInstance == nullptr) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("LOADING STATE CHARACTER"));
 	Inventory->Load(SaveInstance->LoadInventory());
 	Health = SaveInstance->Health;
 }

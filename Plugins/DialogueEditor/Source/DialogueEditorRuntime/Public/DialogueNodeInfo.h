@@ -2,8 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "DialogueNodeInfoBase.h"
-#include <GoingAction/Public/Utility/Fact.h>
 #include "DialogueNodeInfo.generated.h"
+
+enum class EFact : uint8;
 
 USTRUCT(BlueprintType)
 struct FDialogueResponse
@@ -14,7 +15,7 @@ struct FDialogueResponse
 	FText Text = FText::FromString(TEXT("Continue"));
 
 	UPROPERTY(EditAnywhere)
-	EFact Fact = EFact::DEFAULT_TRUE;
+	EFact Fact = static_cast<EFact>(0);
 
 	UPROPERTY(EditAnywhere)
 	bool FactIsTrue = true;
@@ -25,12 +26,12 @@ struct FDialogueResponse
 	FDialogueResponse()
 	{
 		Text = FText::FromString(TEXT("Continue"));
-		Fact = EFact::DEFAULT_TRUE;
+		Fact = static_cast<EFact>(0);
 	}
 	FDialogueResponse(const FText& InText)
 	{
 		Text = InText;
-		Fact = EFact::DEFAULT_TRUE;
+		Fact = static_cast<EFact>(0);
 	}
 	FDialogueResponse(EFact InFact, const FText& InText)
 	{

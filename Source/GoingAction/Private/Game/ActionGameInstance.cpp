@@ -15,8 +15,13 @@ ADialogueManager* UActionGameInstance::GetDialogueManager()
 	return DialogueManagerInstance;
 }
 
-void UActionGameInstance::AssignToSaving(ISaveLoad* Instance, bool LoadStateOnAssign)
+void UActionGameInstance::AssignToSaving(TScriptInterface<ISaveLoad> Instance, bool LoadStateOnAssign)
 {
+	if (Instance == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("INSTANCE IS NULL THE ONE U TRY TO SET WTF"));
+		return;
+	}
 	InstancesToSave.AddUnique(Instance);
 	if (LoadStateOnAssign && CurrentSave)
 	{
@@ -35,7 +40,7 @@ void UActionGameInstance::SaveGame()
 	UE_LOG(LogTemp, Warning, TEXT("SAVING GAME"));
 	if (!CurrentSave) CurrentSave = CreateSaveInstance();
 
-	for (ISaveLoad* Instance : InstancesToSave)
+	for (TScriptInterface<ISaveLoad> Instance : InstancesToSave)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SAVING INSTANCE %s"), *Instance->_getUObject()->GetName());
 		if (Instance == nullptr)
@@ -52,16 +57,20 @@ void UActionGameInstance::SaveGame()
 
 void UActionGameInstance::LoadGame()
 {
+	UE_LOG(LogTemp, Warning, TEXT("LOAD GAME"));
 	if (UGameplayStatics::DoesSaveGameExist(SaveSlot, 0))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("FOUND SAVE GAME"));
 		CurrentSave = Cast<USaveInstance>(UGameplayStatics::LoadGameFromSlot(SaveSlot, 0));
 	}
 	else
 	{
+		UE_LOG(LogTemp, Warning, TEXT("CREATING SAVE GAME"));
 		CurrentSave = CreateSaveInstance();
-		// Maybe return? No need to load empty states
+		return;
 	}
-	for (ISaveLoad* Instance : InstancesToSave)
+	UE_LOG(LogTemp, Warning, TEXT("LOOPING THROUGH SAVE INSTANCES"));
+	for (TScriptInterface<ISaveLoad> Instance : InstancesToSave)
 	{
 		Instance->LoadState(CurrentSave);
 	}

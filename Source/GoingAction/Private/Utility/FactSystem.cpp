@@ -20,6 +20,9 @@ void UFactSystem::SaveState(USaveInstance* SaveInstance)
 
 void UFactSystem::LoadState(USaveInstance* SaveInstance)
 {
+	if (SaveInstance == nullptr) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("LOADING STATE FACT SYSTEM"));
 	TMap<EFact, bool> LoadedFacts;
 	for (TPair<uint8, bool> Pair : SaveInstance->Facts)
 	{
@@ -30,8 +33,14 @@ void UFactSystem::LoadState(USaveInstance* SaveInstance)
 
 void UFactSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
-	UActionGameInstance* ActionGameInstance = (UActionGameInstance*)GetGameInstance();
-	if (ActionGameInstance) ActionGameInstance->AssignToSaving(this, true);
+	UE_LOG(LogTemp, Warning, TEXT("TRYING TO ASSIGN SAVE FACT SYSTEM"));
+	if (UActionGameInstance* ActionGameInstance = (UActionGameInstance*)GetGameInstance())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ASSIGNING TO SAVE FACT SYSTEM"));
+		ActionGameInstance->AssignToSaving(this, true);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("CONTINUE FACT SYSTEM"));
+
 	UpdateFact(EFact::DEFAULT_TRUE, true);
 }
 

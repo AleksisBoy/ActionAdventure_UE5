@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "DialogueNodeInfoBase.h"
-#include <GoingAction/Public/Utility/Fact.h>
-#include <GoingAction/Public/Data/ItemAsset.h>
 #include "DialogueImpactNodeInfo.generated.h"
+
+class UItemAsset; 
+enum class EFact : uint8;
 
 // Structs for every impact choice
 USTRUCT(BlueprintType)
@@ -15,10 +16,10 @@ struct FFactImpact
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere)
-	EFact Fact;
+	EFact Fact = static_cast<EFact>(0);
 
 	UPROPERTY(EditAnywhere)
-	bool Value;
+	bool Value = true;
 };
 
 USTRUCT(BlueprintType)
@@ -27,10 +28,10 @@ struct FItemImpact
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	UItemAsset* Item;
+	UItemAsset* Item = nullptr;
 	
 	UPROPERTY(EditAnywhere)
-	int Amount;
+	int Amount = 1;
 };
 
 /* for future implementations

@@ -147,7 +147,7 @@ void FDialogueEditorModule::StartupModule()
 
 	FSlateImageBrush* IconBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("DialogueAssetIcon"), TEXT(".png")), FVector2D(128, 128));
 	FSlateImageBrush* ThumbnailBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("DialogueAssetThumbnail"), TEXT(".png")), FVector2D(128, 128));
-	FSlateImageBrush* NodeAddBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("NodePinIcon"), TEXT(".png")), FVector2D(128, 128));
+	FSlateImageBrush* NodeAddBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("NodeAddPinIcon"), TEXT(".png")), FVector2D(128, 128));
 	FSlateImageBrush* NodeDeletePinBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("NodeDeletePinIcon"), TEXT(".png")), FVector2D(128, 128));
 	FSlateImageBrush* NodeDeleteNodeBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("NodeDeleteNodeIcon"), TEXT(".png")), FVector2D(128, 128));
 	StyleSet->Set(TEXT("ClassThumbnail.DialogueAsset"), ThumbnailBrush);

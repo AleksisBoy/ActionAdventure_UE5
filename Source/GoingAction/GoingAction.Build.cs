@@ -26,5 +26,5 @@ public class GoingAction : ModuleRules
                 "DialogueEditor"
             });
         }
-	}
+    }
 }

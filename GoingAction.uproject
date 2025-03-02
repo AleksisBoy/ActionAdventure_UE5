@@ -22,6 +22,11 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+
+		{
+  			"Name": "DialogueEditor",
+  			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [

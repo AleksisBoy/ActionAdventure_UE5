@@ -22,8 +22,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class UDialogueWidgetController> DialogueWidgetClass;
 
-
-	void AssignToSaving(ISaveLoad* Instance, bool LoadStateOnAssign);
+	UFUNCTION()
+	void AssignToSaving(TScriptInterface<ISaveLoad> Instance, bool LoadStateOnAssign);
 
 	UPROPERTY(EditDefaultsOnly)
 	FString SaveSlot = TEXT("TestSlot01");
@@ -47,7 +47,7 @@ private:
 	USaveInstance* CurrentSave = nullptr;
 	
 	UPROPERTY()
-	TArray<ISaveLoad*> InstancesToSave;
+	TArray<TScriptInterface<ISaveLoad>> InstancesToSave;
 
 public:
 	FORCEINLINE USaveInstance* GetCurrentSave() const { return CurrentSave; }
