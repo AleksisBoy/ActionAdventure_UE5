@@ -3,15 +3,20 @@
 
 #include "Weapons/Weapon.h"	
 #include "Components/BoxComponent.h"
+#include "Data/WeaponAsset.h"
 
 AWeapon::AWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	HandleComp = CreateDefaultSubobject<USceneComponent>(TEXT("Handle"));
+	RootComponent = HandleComp;
+
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	RootComponent = Mesh;
+	Mesh->SetupAttachment(RootComponent);
 
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
+	BoxComp->SetupAttachment(RootComponent);
 }
 
 
@@ -23,9 +28,11 @@ void AWeapon::Tick(float DeltaTime)
 
 void AWeapon::Equip()
 {
+	SetActorRelativeRotation(BaseRotation);
 }
 
 void AWeapon::Dequip()
 {
+	SetActorRelativeRotation(ScabbardRotation);
 }
 

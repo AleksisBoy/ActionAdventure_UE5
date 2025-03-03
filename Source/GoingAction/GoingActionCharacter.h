@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "Interfaces/Health.h"
 #include "Interfaces/SaveLoad.h"
+#include "Utility/Prerequisites.h"
 #include "GoingActionCharacter.generated.h"
 
 //UENUM(Blueprintable, BlueprintType)
@@ -26,6 +27,9 @@ class ABaseInteractableActor;
 class AItemPickupActor;
 class UUserWidget;
 class USaveInstance;
+class AWeapon;
+
+enum class FWeaponType : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractableChanged, TScriptInterface<IInteractable>, Interactable);
 
@@ -75,6 +79,20 @@ class AGoingActionCharacter : public ACharacter, public IHealth, public ISaveLoa
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ToggleWalkAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ToggleSteelWeaponAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ToggleSilverWeaponAction;
+
+
+	// Anim Montages
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Animations", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* SheatheWeaponMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Animations", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* UnSheatheWeaponMontage;
+
 public:
 	AGoingActionCharacter();
 
@@ -108,8 +126,8 @@ public:
 
 	// IHealth
 	virtual void GetHit(float Damage, FVector HitLocation) override;
-	virtual ELoyalty GetLoyalty() override;
-	virtual FVector GetInterfaceLocation() override;
+	virtual ELoyalty GetLoyalty() { return ELoyalty::Friendly; }
+	virtual FVector GetInterfaceLocation() { return GetActorLocation(); }
 	virtual bool TakeTokens(int Tokens) override;
 	virtual void ReturnTokens(int Tokens) override;
 
@@ -131,6 +149,8 @@ protected:
 
 	void Look(const FInputActionValue& Value);
 
+	void Attack(const FInputActionValue& Value);
+
 	void TryLockCamera(const FInputActionValue& Value);
 
 	void Interact(const FInputActionValue& Value);
@@ -139,7 +159,13 @@ protected:
 
 	void ToggleWalk(const FInputActionValue& Value);
 
+	void ToggleSteelSheatheWeapon(const FInputActionValue& Value);
+	void ToggleSilverSheatheWeapon(const FInputActionValue& Value);
+
 protected:
+	UFUNCTION()
+	void OnMontageNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	virtual void BeginPlay();
@@ -180,6 +206,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement")
 	float SprintSpeed = 800.f;
 	
+	UPROPERTY()
 	float CurrentSpeed = 0.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Character Movement")
@@ -189,6 +216,31 @@ protected:
 	bool IsSprinting = false;
 
 	void UpdateSpeed();
+
+	// Combat
+	UPROPERTY(BlueprintReadWrite, Category = "Character Combat")
+	AWeapon* SheathedWeapon = nullptr;
+	
+	UPROPERTY(BlueprintReadWrite, Category = "Character Combat")
+	AWeapon* CurrentSteelWeapon = nullptr;
+	
+	UPROPERTY(BlueprintReadWrite, Category = "Character Combat")
+	AWeapon* CurrentSilverWeapon = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Combat")
+	FAttackMontageData FistAttackMontage;
+
+	UFUNCTION()
+	void AttackComboMontage(UAnimInstance* AnimInstance, UAnimMontage* AttackMontage, int MaxCombo);
+
+	UPROPERTY()
+	bool bIsSheathing = false;
+
+	bool bIsComboAllowed = false;
+	int CurrentAttackCombo = 0;
+
+	void ToggleSheatheWeapon(FWeaponType WeaponType);
+	void AllowAttackCombo();
 private:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))

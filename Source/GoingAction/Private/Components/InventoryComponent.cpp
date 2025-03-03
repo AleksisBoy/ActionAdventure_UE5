@@ -170,8 +170,20 @@ void UInventoryComponent::EquipArmor(UArmorAsset* ArmorAsset, UItem* ItemInstanc
 
 void UInventoryComponent::EquipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance)
 {
-	if (WeaponItem == ItemInstance) DequipWeapon(WeaponAsset, ItemInstance);
-	else WeaponItem = ItemInstance;
+	UItem* Socket = nullptr;
+	if (WeaponAsset->WeaponType == FWeaponType::Steel) Socket = SteelWeaponItem;
+	else if (WeaponAsset->WeaponType == FWeaponType::Silver) Socket = SilverWeaponItem;
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IMPLEMENT ANY WEAPON TYPE TO EQUIP"));
+		return;
+	}
+	if (Socket == ItemInstance)
+	{
+		Socket = nullptr;
+		//DequipWeapon(WeaponAsset, ItemInstance);
+	}
+	else Socket = ItemInstance;
 
 	OnEquipmentChanged.Broadcast();
 }
@@ -205,7 +217,7 @@ void UInventoryComponent::DequipArmor(UArmorAsset* ArmorAsset, UItem* ItemInstan
 
 void UInventoryComponent::DequipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance)
 {
-	WeaponItem = nullptr;
+	//WeaponItem = nullptr;
 }
 
 void UInventoryComponent::Load(TArray<UItem*> LoadedItems)

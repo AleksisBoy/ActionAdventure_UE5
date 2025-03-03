@@ -24,10 +24,26 @@ public:
 
 	FVector GetCombatLocation();
 
+	// Method used to enable Tick for this class
 	virtual TStatId GetStatId() const override
 	{
 		return GetStatID();
 	}
 protected:
 	virtual void Tick(float DeltaTime) override;
+
+	// entity is not in combat ->
+	// entity encounters (sees, gets triggered/alerted) other entity that has different loyalty ->
+	// entity gets into combat ->
+	// entity behaves accordingly their combat behaviour;
+
+	// Player combat behaviour
+	// base speed changed
+	// in battle stance
+	// each weapon has their own animation montages in blueprint which will get called accordingly on demand
+	// Input mode changes to combat ->
+	// Space key becomes a long dash;
+	// Alt key becomes a short dash;
+	// Enable targeting option
+	// Enjoy the fight
 };

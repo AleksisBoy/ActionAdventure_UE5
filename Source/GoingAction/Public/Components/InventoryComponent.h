@@ -92,9 +92,13 @@ private:
 	UItem* BootsItem;
 
 	// Weapon Sockets
-	UItem* WeaponItem;
+	UPROPERTY()
+	UItem* SteelWeaponItem;
+	UPROPERTY()
+	UItem* SilverWeaponItem;
 
 	// Consumable Sockets
+	UPROPERTY()
 	UItem* FoodItem;
 };
 
