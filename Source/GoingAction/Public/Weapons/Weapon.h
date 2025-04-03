@@ -27,14 +27,16 @@ public:
 	UFUNCTION()
 	virtual void Dequip();
 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	UWeaponAsset* Data = nullptr;
+	UFUNCTION()
+	bool TrySetData(UWeaponAsset* NewData);
 
 	UWeaponAsset* GetData() { return Data; }
 	TArray<FAttackMontageData> GetAttackAnimations() { return AttackAnimations; }
 protected:
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+	UWeaponAsset* Data = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	FRotator BaseRotation;
 	

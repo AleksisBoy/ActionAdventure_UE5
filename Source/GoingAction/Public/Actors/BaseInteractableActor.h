@@ -23,6 +23,7 @@ public:
 	virtual FVector GetInterfaceLocation() override;
 	virtual bool IsAbleToInteract() override;
 	virtual FText GetInteractionName() override;
+	virtual FText GetInteractionText() override;
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;

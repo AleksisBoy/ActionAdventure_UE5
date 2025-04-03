@@ -36,3 +36,21 @@ void AWeapon::Dequip()
 	SetActorRelativeRotation(ScabbardRotation);
 }
 
+bool AWeapon::TrySetData(UWeaponAsset* NewData)
+{
+	// remake so that new actors dont need to be spawned. reuse one instance
+	if (NewData == nullptr)
+	{
+		// destroy?
+		return true;
+	}
+	if (NewData == Data) return true;
+
+	if (NewData->WeaponActorClass == StaticClass())
+	{
+		Data = NewData;
+	}
+
+	return false;
+}
+

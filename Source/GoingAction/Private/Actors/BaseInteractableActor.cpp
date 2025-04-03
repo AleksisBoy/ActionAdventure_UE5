@@ -43,6 +43,11 @@ FText ABaseInteractableActor::GetInteractionName()
 	return FText::FromString("DEFAULT");
 }
 
+FText ABaseInteractableActor::GetInteractionText()
+{
+	return FText::FromString("DEFAULT");
+}
+
 void ABaseInteractableActor::BeginPlay()
 {
 	Super::BeginPlay();

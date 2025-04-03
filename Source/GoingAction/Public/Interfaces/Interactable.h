@@ -31,4 +31,7 @@ public:
 
 	UFUNCTION(BlueprintCallable,  Category = "Interactable")
 	virtual FText GetInteractionName() = 0;
+
+	UFUNCTION(BlueprintCallable,  Category = "Interactable")
+	virtual FText GetInteractionText() = 0;
 };

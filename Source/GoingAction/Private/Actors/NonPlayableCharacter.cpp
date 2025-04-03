@@ -33,7 +33,8 @@ ANonPlayableCharacter::ANonPlayableCharacter() : Super()
 
 void ANonPlayableCharacter::QuitDialogue()
 {
-	Controller->GetBlackboardComponent()->SetValueAsBool("InDialogue", false);
+	InDialogue = false;
+	Controller->GetBlackboardComponent()->SetValueAsBool("InDialogue", InDialogue);
 }
 
 void ANonPlayableCharacter::Interact(AGoingActionCharacter* Character)
@@ -43,8 +44,10 @@ void ANonPlayableCharacter::Interact(AGoingActionCharacter* Character)
 	
 	GameInstance->GetDialogueManager()->PlayDialogue(NPCDialogue, Character, this);
 
-	Controller->GetBlackboardComponent()->SetValueAsBool("InDialogue", true);
+	InDialogue = true;
+	Controller->GetBlackboardComponent()->SetValueAsBool("InDialogue", InDialogue);
 	Controller->GetBlackboardComponent()->SetValueAsVector("TargetLocation", Character->GetActorLocation());
+	// rotate towards speaker
 }
 
 FVector ANonPlayableCharacter::GetInterfaceLocation()
@@ -54,13 +57,17 @@ FVector ANonPlayableCharacter::GetInterfaceLocation()
 
 bool ANonPlayableCharacter::IsAbleToInteract()
 {
-	// Add logic
-	return NPCDialogue != nullptr;
+	return !InDialogue && NPCDialogue != nullptr;
 }
 
 FText ANonPlayableCharacter::GetInteractionName()
 {
-	return FText::FromString(GetName());
+	return NPCData->Name;
+}
+
+FText ANonPlayableCharacter::GetInteractionText()
+{
+	return FText::FromString(TEXT("Talk"));
 }
 
 void ANonPlayableCharacter::GetHit(float Damage, FVector HitLocation)

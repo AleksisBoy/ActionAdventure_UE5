@@ -28,6 +28,7 @@ public:
 	virtual FVector GetInterfaceLocation() override;
 	virtual bool IsAbleToInteract() override;
 	virtual FText GetInteractionName() override;
+	virtual FText GetInteractionText() override;
 
 	// IHealth
 	virtual void GetHit(float Damage, FVector HitLocation) override;
@@ -77,4 +78,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "NPC", meta = (AllowPrivateAccess = "true"))
 	UNPCData* NPCData = nullptr;
+
+	UPROPERTY()
+	bool InDialogue = false;
 };

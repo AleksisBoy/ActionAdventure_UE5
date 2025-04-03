@@ -14,6 +14,7 @@ enum class EFact : uint8
 	DEBUG_003,
 
 	GAME_RobertDied,
+	GAME_KnowAboutTrickster,
 	GAME_VisitedOldTown,
 	GAME_HasLevel5,
 	GAME_HasLevel10,

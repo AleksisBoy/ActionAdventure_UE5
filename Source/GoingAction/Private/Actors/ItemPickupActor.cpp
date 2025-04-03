@@ -61,7 +61,12 @@ bool AItemPickupActor::IsAbleToInteract()
 
 FText AItemPickupActor::GetInteractionName()
 {
-	return FText::FromString(GetName());
+	return PickupActorName;
+}
+
+FText AItemPickupActor::GetInteractionText()
+{
+	return FText::FromString(TEXT("Loot"));
 }
 
 void AItemPickupActor::Tick(float DeltaTime)

@@ -290,12 +290,22 @@ void AGoingActionCharacter::EquipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemIn
 		if (CurrentSteelWeapon)
 		{
 			// Dont destroy but change its mesh, etc?
-			//CurrentSteelWeapon->Destroy();
+			if (!CurrentSteelWeapon->TrySetData(WeaponAsset)) CurrentSteelWeapon->Destroy();
+			else
+			{
+				CurrentSteelWeapon = (AWeapon*)GetWorld()->SpawnActor(WeaponAsset->WeaponActorClass);
+				CurrentSteelWeapon->TrySetData(WeaponAsset);
+				CurrentSteelWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("scabbard")));
+				CurrentSteelWeapon->Dequip();
+			}
 		}
-		CurrentSteelWeapon = (AWeapon*)GetWorld()->SpawnActor(WeaponAsset->WeaponActorClass);
-		CurrentSteelWeapon->Data = WeaponAsset; // change
-		CurrentSteelWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("scabbard")));
-		CurrentSteelWeapon->Dequip();
+		else
+		{
+			CurrentSteelWeapon = (AWeapon*)GetWorld()->SpawnActor(WeaponAsset->WeaponActorClass);
+			CurrentSteelWeapon->TrySetData(WeaponAsset); 
+			CurrentSteelWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("scabbard")));
+			CurrentSteelWeapon->Dequip();
+		}
 	}
 	Inventory->EquipWeapon(WeaponAsset, ItemInstance);
 }
@@ -548,6 +558,7 @@ void AGoingActionCharacter::Interact(const FInputActionValue& Value)
 	if (InteractableInFront)
 	{
 		InteractableInFront->Interact(this);
+		FindInteractableInFront();
 	}
 }
 

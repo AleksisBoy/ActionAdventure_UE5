@@ -92,13 +92,13 @@ private:
 	UItem* BootsItem;
 
 	// Weapon Sockets
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UItem* SteelWeaponItem;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UItem* SilverWeaponItem;
 
 	// Consumable Sockets
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UItem* FoodItem;
 };
 

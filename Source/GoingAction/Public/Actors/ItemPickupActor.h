@@ -24,6 +24,7 @@ public:
 	virtual FVector GetInterfaceLocation() override;
 	virtual bool IsAbleToInteract() override;
 	virtual FText GetInteractionName() override;
+	virtual FText GetInteractionText() override;
 protected:
 
 	virtual void BeginPlay() override;
@@ -34,6 +35,9 @@ protected:
 		bool bFromSweep, const FHitResult& SweepResult) override;
 
 	void ItemsEmptied();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Pickup")
+	FText PickupActorName = FText::FromString(TEXT("DEFAULT"));
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item Pickup")
 	bool Looted = false;
