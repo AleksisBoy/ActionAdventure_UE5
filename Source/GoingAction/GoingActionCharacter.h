@@ -32,6 +32,7 @@ class AWeapon;
 enum class FWeaponType : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractableChanged, TScriptInterface<IInteractable>, Interactable);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentHealth, float, MaxHealth);
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -124,8 +125,13 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FInteractableChanged OnInteractableChanged;
 
+	UPROPERTY(BlueprintAssignable)
+	FHealthChanged OnPlayerHealthChanged;
+
 	// IHealth
 	virtual void GetHit(float Damage, FVector HitLocation) override;
+	virtual void HealPrecise(float HealHealth) override;
+	virtual void HealPerc(float Perc) override;
 	virtual ELoyalty GetLoyalty() { return ELoyalty::Friendly; }
 	virtual FVector GetInterfaceLocation() { return GetActorLocation(); }
 	virtual bool TakeTokens(int Tokens) override;

@@ -26,6 +26,12 @@ class GOINGACTION_API IHealth
 public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	virtual void GetHit(float Damage, FVector HitLocation) = 0;
+	
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	virtual void HealPrecise(float HealHealth) = 0;
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	virtual void HealPerc(float Perc) = 0;
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	virtual ELoyalty GetLoyalty() = 0;

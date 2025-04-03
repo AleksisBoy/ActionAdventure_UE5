@@ -30,6 +30,14 @@ void AEnemy::GetHit(float Damage, FVector HitLocation)
 {
 }
 
+void AEnemy::HealPrecise(float HealHealth)
+{
+}
+
+void AEnemy::HealPerc(float Perc)
+{
+}
+
 ELoyalty AEnemy::GetLoyalty()
 {
 	return ELoyalty();

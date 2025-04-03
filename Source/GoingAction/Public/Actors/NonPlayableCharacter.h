@@ -32,6 +32,8 @@ public:
 
 	// IHealth
 	virtual void GetHit(float Damage, FVector HitLocation) override;
+	virtual void HealPrecise(float HealHealth) override;
+	virtual void HealPerc(float Perc) override;
 	virtual ELoyalty GetLoyalty() override;
 	virtual bool TakeTokens(int Tokens) override;
 	virtual void ReturnTokens(int Tokens) override;
@@ -60,6 +62,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	int MyAttackTokens = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	float MaxHealth = 100.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Combat")
 	TScriptInterface<IHealth> CurrentTarget = nullptr;

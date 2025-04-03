@@ -79,6 +79,14 @@ void ANonPlayableCharacter::GetHit(float Damage, FVector HitLocation)
 	}
 }
 
+void ANonPlayableCharacter::HealPrecise(float HealHealth)
+{
+	Health = FMath::Clamp(Health + HealHealth, 0, MaxHealth);
+}
+void ANonPlayableCharacter::HealPerc(float Perc)
+{
+	Health = FMath::Clamp(Health + MaxHealth * Perc, 0, MaxHealth);
+}
 ELoyalty ANonPlayableCharacter::GetLoyalty()
 {
 	if (!NPCData) return ELoyalty::Friendly;

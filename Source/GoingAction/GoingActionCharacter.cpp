@@ -131,6 +131,17 @@ void AGoingActionCharacter::GetHit(float Damage, FVector HitLocation)
 	{
 		Die();
 	}
+	OnPlayerHealthChanged.Broadcast(Health, MaxHealth);
+}
+void AGoingActionCharacter::HealPrecise(float HealHealth)
+{
+	Health = FMath::Clamp(Health + HealHealth, 0, MaxHealth);
+	OnPlayerHealthChanged.Broadcast(Health, MaxHealth);
+}
+void AGoingActionCharacter::HealPerc(float Perc)
+{
+	Health = FMath::Clamp(Health + MaxHealth * Perc, 0, MaxHealth);
+	OnPlayerHealthChanged.Broadcast(Health, MaxHealth);
 }
 bool AGoingActionCharacter::TakeTokens(int Tokens)
 {
@@ -319,7 +330,7 @@ void AGoingActionCharacter::EatFood(UFoodAsset* FoodAsset, UItem* ItemInstance)
 {
 	if (Inventory->TryRemoveItem(ItemInstance, 1))
 	{
-		Health += FoodAsset->HealDuration * FoodAsset->HealingPerSec;
+		HealPrecise(FoodAsset->HealDuration * FoodAsset->HealingPerSec);
 	}
 }
 

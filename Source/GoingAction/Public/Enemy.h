@@ -17,6 +17,8 @@ public:
 
 	// IHealth
 	virtual void GetHit(float Damage, FVector HitLocation) override;
+	virtual void HealPrecise(float HealHealth) override;
+	virtual void HealPerc(float Perc) override;
 	virtual ELoyalty GetLoyalty() override;
 	virtual FVector GetInterfaceLocation() override;
 	virtual bool TakeTokens(int Tokens) override;
