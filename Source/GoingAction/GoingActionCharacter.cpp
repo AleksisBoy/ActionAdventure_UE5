@@ -88,7 +88,6 @@ void AGoingActionCharacter::BeginPlay()
 	{
 		CombatSub->StartCombat(this);
 	}
-
 	// Movement Speed
 	CharacterMovement = GetComponentByClass<UCharacterMovementComponent>();
 	if (CharacterMovement)
@@ -101,6 +100,8 @@ void AGoingActionCharacter::BeginPlay()
 	{
 		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AGoingActionCharacter::OnMontageNotifyBegin);
 	}
+
+	SteelWeapon = CreateWeaponActor(Inventory->GetSteelWeaponAsset() ? (UWeaponAsset*)Inventory->GetSteelWeaponAsset()->Asset : nullptr);
 
 	// Turn off UI Tab and Key navigation
 	FNavigationConfig& NavigationConfig = *FSlateApplication::Get().GetNavigationConfig();
@@ -224,9 +225,9 @@ void AGoingActionCharacter::ToggleSheatheWeapon(FWeaponType WeaponType)
 		// play unsheathe animation first and continue it with sheating
 		UE_LOG(LogTemp, Warning, TEXT("UnSheathed weapon"));
 		SheathedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("scabbard")));
-		SheathedWeapon->Dequip();
+		SheathedWeapon->UnSheathe();
 
-		if (SheathedWeapon->GetData()->WeaponType == WeaponType)
+		if (SheathedWeapon->GetData() && SheathedWeapon->GetData()->WeaponType == WeaponType)
 		{
 			PlayAnimMontage(UnSheatheWeaponMontage);
 			SheathedWeapon = nullptr;
@@ -236,12 +237,12 @@ void AGoingActionCharacter::ToggleSheatheWeapon(FWeaponType WeaponType)
 	}
 	
 	// play sheathe animation
-	SheathedWeapon = WeaponType == FWeaponType::Steel ? CurrentSteelWeapon : CurrentSilverWeapon;
-	if (!SheathedWeapon) return;
+	SheathedWeapon = WeaponType == FWeaponType::Steel ? SteelWeapon : SilverWeapon;
+	if (!SheathedWeapon || !SheathedWeapon->GetData()) return;
 
 	PlayAnimMontage(SheatheWeaponMontage);
 	SheathedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("weapon_r")));
-	SheathedWeapon->Equip();
+	SheathedWeapon->Sheathe();
 	UE_LOG(LogTemp, Warning, TEXT("Sheathed weapon"));
 }
 
@@ -249,6 +250,17 @@ void AGoingActionCharacter::AllowAttackCombo()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Allowed combo"));
 	bIsComboAllowed = true;
+}
+
+AWeapon* AGoingActionCharacter::CreateWeaponActor(UWeaponAsset* WeaponAsset)
+{
+	AWeapon* TempWeapon = (AWeapon*)GetWorld()->SpawnActor(WeaponActorBaseClass);
+	if (WeaponAsset)
+	{
+		TempWeapon->SetData(WeaponAsset);
+	}
+	TempWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("scabbard")));
+	return TempWeapon;
 }
 
 void AGoingActionCharacter::FindInteractableInFront()
@@ -298,25 +310,14 @@ void AGoingActionCharacter::EquipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemIn
 
 	if (WeaponAsset->WeaponType == FWeaponType::Steel)
 	{
-		if (CurrentSteelWeapon)
+		if (SteelWeapon)
 		{
-			// Dont destroy but change its mesh, etc?
-			if (!CurrentSteelWeapon->TrySetData(WeaponAsset)) CurrentSteelWeapon->Destroy();
-			else
-			{
-				CurrentSteelWeapon = (AWeapon*)GetWorld()->SpawnActor(WeaponAsset->WeaponActorClass);
-				CurrentSteelWeapon->TrySetData(WeaponAsset);
-				CurrentSteelWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("scabbard")));
-				CurrentSteelWeapon->Dequip();
-			}
+			SteelWeapon->SetData(WeaponAsset);
 		}
 		else
 		{
-			CurrentSteelWeapon = (AWeapon*)GetWorld()->SpawnActor(WeaponAsset->WeaponActorClass);
-			CurrentSteelWeapon->TrySetData(WeaponAsset); 
-			CurrentSteelWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("scabbard")));
-			CurrentSteelWeapon->Dequip();
-		}
+			SteelWeapon = CreateWeaponActor(WeaponAsset);
+		}	
 	}
 	Inventory->EquipWeapon(WeaponAsset, ItemInstance);
 }
@@ -426,44 +427,11 @@ void AGoingActionCharacter::Attack(const FInputActionValue& Value)
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (!AnimInstance) return;
 
-	if (SheathedWeapon && SheathedWeapon->GetAttackAnimations().Num() != 0)
+	if (SheathedWeapon && SheathedWeapon->GetData()->AttackAnimations.Num() != 0)
 	{
-		FAttackMontageData AttackMontageData = SheathedWeapon->GetAttackAnimations()[0];
+		FAttackMontageData AttackMontageData = SheathedWeapon->GetData()->AttackAnimations[0];
 		AttackComboMontage(AnimInstance, AttackMontageData.Montage, AttackMontageData.Amount);
 
-		/*if (!GetMesh()->GetAnimInstance()->Montage_IsPlaying(AttackMontage))
-		{
-			CurrentAttackCombo = 0;
-			bIsComboAllowed = false;
-
-			AnimInstance->Montage_Play(AttackMontage);
-			AnimInstance->Montage_JumpToSection(FName("Attack0"), AttackMontage);
-			//PlayAnimMontage(AttackMontage, 1.f, FName(TEXT("Attack0")));
-		}
-		else if (bIsComboAllowed)
-		{
-			bIsComboAllowed = false;
-			CurrentAttackCombo++;
-
-			if (CurrentAttackCombo == 1)
-			{
-				AnimInstance->Montage_SetNextSection(FName("Attack0"), FName("Attack1"), AttackMontage);
-				//PlayAnimMontage(AttackMontage, 1.f, FName(TEXT("Attack1")));
-			}
-			else if (CurrentAttackCombo == 2)
-			{
-				AnimInstance->Montage_SetNextSection(FName("Attack1"), FName("Attack2"), AttackMontage);
-				//PlayAnimMontage(AttackMontage, 1.f, FName(TEXT("Attack2")));
-			}
-			else
-			{
-				AnimInstance->Montage_Play(AttackMontage);
-				//PlayAnimMontage(AttackMontage, 1.f, FName(TEXT("Attack0")));
-				CurrentAttackCombo = 0;
-			}
-
-		}
-		*/
 		//PlayAnimMontage(SheathedWeapon->GetAttackAnimations()[0]);
 		UE_LOG(LogTemp, Warning, TEXT("%d"), CurrentAttackCombo);
 	}

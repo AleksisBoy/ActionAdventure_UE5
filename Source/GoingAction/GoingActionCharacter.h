@@ -224,14 +224,17 @@ protected:
 	void UpdateSpeed();
 
 	// Combat
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Character Combat")
+	TSubclassOf<AWeapon> WeaponActorBaseClass = nullptr;
+	
 	UPROPERTY(BlueprintReadWrite, Category = "Character Combat")
 	AWeapon* SheathedWeapon = nullptr;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Character Combat")
-	AWeapon* CurrentSteelWeapon = nullptr;
+	AWeapon* SteelWeapon = nullptr;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Character Combat")
-	AWeapon* CurrentSilverWeapon = nullptr;
+	AWeapon* SilverWeapon = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Combat")
 	FAttackMontageData FistAttackMontage;
@@ -248,6 +251,8 @@ protected:
 	void ToggleSheatheWeapon(FWeaponType WeaponType);
 	void AllowAttackCombo();
 private:
+
+	AWeapon* CreateWeaponActor(UWeaponAsset* WeaponAsset);
 
 	UPROPERTY(BlueprintReadWrite, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))
 	AActor* CurrentlyLocked = nullptr;

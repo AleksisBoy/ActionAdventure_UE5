@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/WorldSubsystem.h"
-#include "WorldInfo.generated.h"
+#include "WorldInfoSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHourPassed);
 
-UCLASS(Blueprintable)
-class GOINGACTION_API UWorldInfo : public UTickableWorldSubsystem
+UCLASS()
+class GOINGACTION_API UWorldInfoSubsystem : public UTickableWorldSubsystem
 {
 	GENERATED_BODY()
 public:
-	UWorldInfo();
+	UWorldInfoSubsystem();
 
 	UFUNCTION(BlueprintCallable)
 	float GetTime();

@@ -22,26 +22,22 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
-	virtual void Equip();
+	virtual void Sheathe();
 
 	UFUNCTION()
-	virtual void Dequip();
+	virtual void UnSheathe();
+
+	void UpdateLocationAndRotation();
 
 	UFUNCTION()
-	bool TrySetData(UWeaponAsset* NewData);
+	void SetData(UWeaponAsset* NewData);
 
 	UWeaponAsset* GetData() { return Data; }
-	TArray<FAttackMontageData> GetAttackAnimations() { return AttackAnimations; }
+	//TArray<FAttackMontageData> GetAttackAnimations() { return AttackAnimations; }
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	UWeaponAsset* Data = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	FRotator BaseRotation;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	FRotator ScabbardRotation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	USceneComponent* HandleComp = nullptr;
@@ -53,8 +49,8 @@ protected:
 	UBoxComponent* BoxComp = nullptr;
 
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	TArray<FAttackMontageData> AttackAnimations;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	//TArray<FAttackMontageData> AttackAnimations;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	//float Damage = 10.f;
@@ -66,4 +62,6 @@ protected:
 	// needed?
 	UPROPERTY(BlueprintReadWrite, Category = "Weapon")
 	float LastAttackTime = 0.f;
+
+	bool bSheathed = false;
 };

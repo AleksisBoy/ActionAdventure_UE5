@@ -47,6 +47,9 @@ public:
 	void DequipArmor(UArmorAsset* ArmorAsset, UItem* ItemInstance, EArmorSocket ArmorSocket);
 	void DequipWeapon(UWeaponAsset* WeaponAsset, UItem* ItemInstance);
 
+	UItem* GetSteelWeaponAsset() { return SteelWeaponItem; }
+	UItem* GetSilverWeaponAsset() { return SilverWeaponItem; }
+
 	UPROPERTY(BlueprintAssignable)
 	FEquipmentChanged OnEquipmentChanged;
 

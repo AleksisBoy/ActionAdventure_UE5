@@ -26,31 +26,51 @@ void AWeapon::Tick(float DeltaTime)
 
 }
 
-void AWeapon::Equip()
+void AWeapon::Sheathe()
 {
-	SetActorRelativeRotation(BaseRotation);
+	if (!Data || bSheathed) return;
+
+	bSheathed = true;
+	UpdateLocationAndRotation();
 }
 
-void AWeapon::Dequip()
+void AWeapon::UnSheathe()
 {
-	SetActorRelativeRotation(ScabbardRotation);
+	if (!Data || !bSheathed) return;
+
+	bSheathed = false;
+	UpdateLocationAndRotation();
 }
 
-bool AWeapon::TrySetData(UWeaponAsset* NewData)
+void AWeapon::UpdateLocationAndRotation()
 {
-	// remake so that new actors dont need to be spawned. reuse one instance
-	if (NewData == nullptr)
+	if (bSheathed)
 	{
-		// destroy?
-		return true;
+		SetActorRelativeLocation(Data->HandOffset);
+		SetActorRelativeRotation(Data->HandRotation);
 	}
-	if (NewData == Data) return true;
-
-	if (NewData->WeaponActorClass == StaticClass())
+	else
 	{
-		Data = NewData;
+		SetActorRelativeLocation(Data->ScabbardOffset);
+		SetActorRelativeRotation(Data->ScabbardRotation);
 	}
+}
 
-	return false;
+void AWeapon::SetData(UWeaponAsset* NewData)
+{
+	if (!NewData)
+	{
+		Data = nullptr;
+		Mesh->SetStaticMesh(nullptr);
+		return;
+	}
+	else if (Data == NewData) return;
+
+	Data = NewData;
+	Mesh->SetStaticMesh(Data->StaticMesh);
+	Mesh->SetRelativeLocation(Data->MeshOffset);
+	BoxComp->SetRelativeLocation(Data->BoxCompOffset);
+	BoxComp->SetBoxExtent(Data->BoxCompExtent);
+	UpdateLocationAndRotation();
 }
 

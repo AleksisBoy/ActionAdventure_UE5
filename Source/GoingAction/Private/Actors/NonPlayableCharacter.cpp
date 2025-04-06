@@ -4,7 +4,7 @@
 #include "Actors/NonPlayableCharacter.h"
 #include "NPCController.h"
 #include "Data/NPCData.h"
-#include "WorldInfo.h"
+#include "WorldInfoSubsystem.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
@@ -180,7 +180,7 @@ bool ANonPlayableCharacter::GetCurrentSchedule(FNPCScheduleEvent& Schedule, int&
 	if (!NPCData) return false;
 	if (NPCData->Schedule.Num() == 1) { Schedule = NPCData->Schedule[0]; Index = 0; return true; }
 
-	if (UWorldInfo* WorldInfo = GetWorld()->GetSubsystem<UWorldInfo>())
+	if (UWorldInfoSubsystem* WorldInfo = GetWorld()->GetSubsystem<UWorldInfoSubsystem>())
 	{
 		float Time = WorldInfo->GetTime();
 		Index = 0;

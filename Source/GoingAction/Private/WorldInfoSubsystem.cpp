@@ -1,20 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "WorldInfo.h"
+#include "WorldInfoSubsystem.h"
 
 
-UWorldInfo::UWorldInfo()
+UWorldInfoSubsystem::UWorldInfoSubsystem()
 {
 	LastHour = Time;
 }
 
-float UWorldInfo::GetTime()
+float UWorldInfoSubsystem::GetTime()
 {
 	return Time;
 }
 
-void UWorldInfo::Tick(float DeltaTime)
+void UWorldInfoSubsystem::Tick(float DeltaTime)
 {
 	Time += TimePerSec * DeltaTime;
 	if (Time > LastHour + 1)
