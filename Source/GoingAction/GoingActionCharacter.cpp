@@ -123,6 +123,10 @@ void AGoingActionCharacter::OnMontageNotifyBegin(FName NotifyName, const FBranch
 	{
 		AllowAttackCombo();
 	}
+	else if (NotifyName == "StopStrafing")
+	{
+		bIsStrafing = false;
+	}
 }
 void AGoingActionCharacter::GetHit(float Damage, FVector HitLocation)
 {
@@ -210,6 +214,8 @@ void AGoingActionCharacter::UpdateSpeed()
 	if (IsSprinting) CurrentSpeed = SprintSpeed;
 	else CurrentSpeed = IsWalking ? WalkSpeed : JogSpeed;
 
+	if (bInCombat) CurrentSpeed *= CombatSpeedModifier;
+
 	CharacterMovement->MaxWalkSpeed = CurrentSpeed;
 }
 
@@ -225,6 +231,8 @@ void AGoingActionCharacter::ToggleSheatheWeapon(FWeaponType WeaponType)
 		UE_LOG(LogTemp, Warning, TEXT("UnSheathed weapon"));
 		SheathedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("scabbard")));
 		SheathedWeapon->UnSheathe();
+
+		SetInCombat(false);
 
 		if (SheathedWeapon->GetData() && SheathedWeapon->GetData()->WeaponType == WeaponType)
 		{
@@ -246,6 +254,8 @@ void AGoingActionCharacter::ToggleSheatheWeapon(FWeaponType WeaponType)
 	PlayAnimMontage(SheatheWeaponMontage);
 	SheathedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("weapon_r")));
 	SheathedWeapon->Sheathe();
+
+	SetInCombat(true);
 	UE_LOG(LogTemp, Warning, TEXT("Sheathed weapon"));
 }
 
@@ -354,16 +364,18 @@ void AGoingActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	
+
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+	EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (EnhancedInputComponent) 
+	{
 		// Jumping
 		/*EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);*/
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AGoingActionCharacter::Move);
+		EnhancedInputComponent->BindAction(StrafeAction, ETriggerEvent::Triggered, this, &AGoingActionCharacter::Strafe);
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGoingActionCharacter::Look);
@@ -386,7 +398,7 @@ void AGoingActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	}
 }
 
-
+// Movement Input
 void AGoingActionCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -410,8 +422,16 @@ void AGoingActionCharacter::Move(const FInputActionValue& Value)
 
 		FindInteractableInFront();
 	}
+	LastMoveVector = MovementVector;
 }
 
+void AGoingActionCharacter::Strafe(const FInputActionValue& Value)
+{
+	if (!bInCombat || !CharacterMovement->IsMovingOnGround() || bIsStrafing) return;
+	
+	bIsStrafing = true;
+	PlayAnimMontage(StrafeMontage);
+}
 void AGoingActionCharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -479,6 +499,14 @@ void AGoingActionCharacter::AttackComboMontage(UAnimInstance* AnimInstance, UAni
 
 		AnimInstance->Montage_SetNextSection(CurrentSection, NextSection, AttackMontage);
 	}
+}
+
+void AGoingActionCharacter::SetInCombat(bool InCombat)
+{
+	if (bInCombat == InCombat) return;
+
+	bInCombat = InCombat;
+	UpdateSpeed();
 }
 
 void AGoingActionCharacter::TryLockCamera(const FInputActionValue& Value)
@@ -565,6 +593,7 @@ void AGoingActionCharacter::ToggleSilverSheatheWeapon(const FInputActionValue& V
 {
 	ToggleSheatheWeapon(FWeaponType::Silver);
 }
+
 
 
 // Deprecated

@@ -171,6 +171,7 @@ protected:
 	void ToggleSteelSheatheWeapon(const FInputActionValue& Value);
 	void ToggleSilverSheatheWeapon(const FInputActionValue& Value);
 
+	void Strafe(const FInputActionValue& Value);
 protected:
 	UFUNCTION()
 	void OnMontageNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
@@ -215,6 +216,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement")
 	float SprintSpeed = 800.f;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Movement")
+	float CombatSpeedModifier = 0.5f;
+	
 	UPROPERTY()
 	float CurrentSpeed = 0.f;
 
@@ -223,6 +227,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Character Movement")
 	bool IsSprinting = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Character Movement")
+	bool bIsStrafing = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Movement")
+	UAnimMontage* StrafeMontage = nullptr;
 
 	void UpdateSpeed();
 
@@ -245,6 +255,12 @@ protected:
 	UFUNCTION()
 	void AttackComboMontage(UAnimInstance* AnimInstance, UAnimMontage* AttackMontage, int MaxCombo);
 
+	UFUNCTION()
+	void SetInCombat(bool InCombat);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Combat")
+	bool bInCombat = false;
+
 	UPROPERTY()
 	bool bIsSheathing = false;
 
@@ -255,6 +271,8 @@ protected:
 	void AllowAttackCombo();
 private:
 
+	FVector2D LastMoveVector = FVector2D();
+
 	AWeapon* CreateWeaponActor(UWeaponAsset* WeaponAsset);
 
 	UPROPERTY(BlueprintReadWrite, Category = "Camera Lock", meta = (AllowPrivateAccess = "true"))
@@ -262,6 +280,7 @@ private:
 
 	APlayerController* PlayerController = nullptr;
 	UCharacterMovementComponent* CharacterMovement = nullptr;
+	UEnhancedInputComponent* EnhancedInputComponent = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Character Stats", meta = (AllowPrivateAccess = "true"))
 	float Defense = 0.f;
