@@ -11,7 +11,6 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Enemy.h"
 #include "Components/InventoryComponent.h"
 #include "Utility/SaveInstance.h"
 #include "Kismet/GameplayStatics.h"
@@ -238,7 +237,11 @@ void AGoingActionCharacter::ToggleSheatheWeapon(FWeaponType WeaponType)
 	
 	// play sheathe animation
 	SheathedWeapon = WeaponType == FWeaponType::Steel ? SteelWeapon : SilverWeapon;
-	if (!SheathedWeapon || !SheathedWeapon->GetData()) return;
+	if (!SheathedWeapon || !SheathedWeapon->GetData())
+	{
+		SheathedWeapon = nullptr;
+		return;
+	}
 
 	PlayAnimMontage(SheatheWeaponMontage);
 	SheathedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName(TEXT("weapon_r")));
@@ -273,7 +276,7 @@ void AGoingActionCharacter::FindInteractableInFront()
 		if (!Interactable->IsAbleToInteract()) continue;
 
 		//FVector Direction = Actor->GetActorLocation() - FollowCamera->GetComponentLocation();
-		FVector Direction = Interactable->GetInterfaceLocation() - GetActorLocation();
+		FVector Direction = Interactable->GetInteractionLocation() - GetActorLocation();
 		
 		// Check if Actor is in range of Interaction Distance
 		float Distance = Direction.Length();
@@ -490,7 +493,7 @@ void AGoingActionCharacter::TryLockCamera(const FInputActionValue& Value)
 
 	float MaximumDot = -1.f;
 	AActor* EnemyInFront = nullptr;
-	for (AEnemy* Enemy : AEnemy::Active)
+	/*for (AEnemy* Enemy : AEnemy::Active)
 	{
 		FVector DirectionToEnemy = Enemy->GetActorLocation() - FollowCamera->GetComponentLocation();
 		DirectionToEnemy.Normalize();
@@ -500,7 +503,7 @@ void AGoingActionCharacter::TryLockCamera(const FInputActionValue& Value)
 			MaximumDot = Dot;
 			EnemyInFront = Enemy;
 		}
-	}
+	}*/
 	if (EnemyInFront)
 	{
 		CurrentlyLocked = EnemyInFront;

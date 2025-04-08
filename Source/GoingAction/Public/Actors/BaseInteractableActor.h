@@ -20,7 +20,7 @@ public:
 
 	virtual void Interact(AGoingActionCharacter* Character) override;
 
-	virtual FVector GetInterfaceLocation() override;
+	virtual FVector GetInteractionLocation() override;
 	virtual bool IsAbleToInteract() override;
 	virtual FText GetInteractionName() override;
 	virtual FText GetInteractionText() override;
@@ -42,4 +42,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Interactable Actor")
 	UStaticMeshComponent* Mesh = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Interactable Actor")
+	FVector InteractionWidgetOffset = FVector();
 };

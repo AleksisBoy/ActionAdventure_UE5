@@ -49,11 +49,6 @@ bool AItemPickupActor::Loot(UItemAsset* Item, int& OutAmount)
 	return false;
 }
 
-FVector AItemPickupActor::GetInterfaceLocation()
-{
-	return GetActorLocation();
-}
-
 bool AItemPickupActor::IsAbleToInteract()
 {
 	return !Looted;

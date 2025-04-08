@@ -25,7 +25,7 @@ public:
 
 	// IInteractable
 	virtual void Interact(AGoingActionCharacter* Character) override;
-	virtual FVector GetInterfaceLocation() override;
+	virtual FVector GetInteractionLocation() override;
 	virtual bool IsAbleToInteract() override;
 	virtual FText GetInteractionName() override;
 	virtual FText GetInteractionText() override;
@@ -35,6 +35,7 @@ public:
 	virtual void HealPrecise(float HealHealth) override;
 	virtual void HealPerc(float Perc) override;
 	virtual ELoyalty GetLoyalty() override;
+	virtual FVector GetInterfaceLocation() { return GetActorLocation(); }
 	virtual bool TakeTokens(int Tokens) override;
 	virtual void ReturnTokens(int Tokens) override;
 
@@ -71,6 +72,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "NPC")
 	UDialogueAsset* NPCDialogue = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "NPC")
+	FVector InteractionWidgetOffset = FVector();
 public:	
 	virtual void Tick(float DeltaTime) override;
 

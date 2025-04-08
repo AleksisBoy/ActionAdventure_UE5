@@ -50,9 +50,9 @@ void ANonPlayableCharacter::Interact(AGoingActionCharacter* Character)
 	// rotate towards speaker
 }
 
-FVector ANonPlayableCharacter::GetInterfaceLocation()
+FVector ANonPlayableCharacter::GetInteractionLocation()
 {
-	return GetActorLocation();
+	return GetActorLocation() + InteractionWidgetOffset;
 }
 
 bool ANonPlayableCharacter::IsAbleToInteract()

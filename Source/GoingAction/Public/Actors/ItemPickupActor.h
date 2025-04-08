@@ -21,7 +21,6 @@ public:
 	bool Loot(UItemAsset* Item, int& OutAmount);
 
 	virtual void Interact(AGoingActionCharacter* Character) override;
-	virtual FVector GetInterfaceLocation() override;
 	virtual bool IsAbleToInteract() override;
 	virtual FText GetInteractionName() override;
 	virtual FText GetInteractionText() override;

@@ -27,7 +27,7 @@ public:
 	virtual bool IsAbleToInteract() = 0;
 
 	UFUNCTION(BlueprintCallable,  Category = "Interactable")
-	virtual FVector GetInterfaceLocation() = 0;
+	virtual FVector GetInteractionLocation() = 0;
 
 	UFUNCTION(BlueprintCallable,  Category = "Interactable")
 	virtual FText GetInteractionName() = 0;

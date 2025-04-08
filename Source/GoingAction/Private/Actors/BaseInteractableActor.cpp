@@ -28,9 +28,9 @@ void ABaseInteractableActor::Interact(AGoingActionCharacter* Character)
 	UE_LOG(LogTemp, Warning, TEXT("Interacted with %s"), *GetName());
 }
 
-FVector ABaseInteractableActor::GetInterfaceLocation()
+FVector ABaseInteractableActor::GetInteractionLocation()
 {
-	return GetActorLocation();
+	return GetActorLocation() + InteractionWidgetOffset;
 }
 
 bool ABaseInteractableActor::IsAbleToInteract()
