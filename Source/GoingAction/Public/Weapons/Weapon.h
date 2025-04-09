@@ -19,7 +19,11 @@ public:
 
 	AWeapon();
 
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	void OnAttackStart();
+	void OnAttackFinish();
 
 	UFUNCTION()
 	virtual void Sheathe();
@@ -32,9 +36,20 @@ public:
 	UFUNCTION()
 	void SetData(UWeaponAsset* NewData);
 
+	void SetWielder(AActor* NewWielder) { Wielder = NewWielder; }
+
 	UWeaponAsset* GetData() { return Data; }
 	//TArray<FAttackMontageData> GetAttackAnimations() { return AttackAnimations; }
 protected:
+
+	UFUNCTION()
+	void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+		bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnBoxEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	UWeaponAsset* Data = nullptr;
@@ -59,6 +74,9 @@ protected:
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	//float AttackCooldown = 0.25f;
 	
+	AActor* Wielder = nullptr;
+	TArray<AActor*> ActorsHit;
+
 	// needed?
 	UPROPERTY(BlueprintReadWrite, Category = "Weapon")
 	float LastAttackTime = 0.f;

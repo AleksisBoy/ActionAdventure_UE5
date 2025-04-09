@@ -2,6 +2,8 @@
 
 
 #include "AI/CombatSubsystem.h"
+#include "GameFramework/Character.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 UCombatSubsystem::UCombatSubsystem()
 {
@@ -9,7 +11,12 @@ UCombatSubsystem::UCombatSubsystem()
 
 void UCombatSubsystem::StartCombat(IHealth* Initiator)
 {
-	Members.AddUnique(Initiator);
+	AddMember(Initiator);
+}
+
+void UCombatSubsystem::AddMember(IHealth* Member)
+{
+	Members.AddUnique(Member);
 }
 
 void UCombatSubsystem::RemoveMember(IHealth* Member)
@@ -18,6 +25,42 @@ void UCombatSubsystem::RemoveMember(IHealth* Member)
 	{
 		Members.Remove(Member);
 	}
+}
+
+bool UCombatSubsystem::CallForCombat(FVector Location, float Radius, AActor* Initiator)
+{
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+	TArray<AActor*> ActorsToIgnore; 
+	ActorsToIgnore.Add(Initiator);
+	TArray<AActor*> OutActors;
+
+	UKismetSystemLibrary::SphereOverlapActors(
+		GetWorld(),
+		Location,
+		Radius,
+		ObjectTypes,
+		ACharacter::StaticClass(),
+		ActorsToIgnore,
+		OutActors
+	);
+	
+	TArray<IHealth*> LivingEntities;
+	for (AActor* Character : OutActors)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("found: %s"), *Character->GetName());
+
+		if (IHealth* LivingEntity = Cast<IHealth>(Character))
+		{
+			if (!LivingEntity->IsAbleToCombat() || Members.Contains(LivingEntity)) continue; 
+			
+			LivingEntities.Add(LivingEntity);
+			LivingEntity->EnterCombat();
+			AddMember(LivingEntity);
+		}
+	}
+	return Members.Num() != 0;
 }
 
 IHealth* UCombatSubsystem::GetClosestTargetFor(IHealth* HealthInterface, int AttackTokens)

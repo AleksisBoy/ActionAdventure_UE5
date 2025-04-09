@@ -137,6 +137,8 @@ public:
 	virtual void HealPerc(float Perc) override;
 	virtual ELoyalty GetLoyalty() { return ELoyalty::Friendly; }
 	virtual FVector GetInterfaceLocation() { return GetActorLocation(); }
+	virtual bool IsAbleToCombat() override;
+	virtual void EnterCombat() override;
 	virtual bool TakeTokens(int Tokens) override;
 	virtual void ReturnTokens(int Tokens) override;
 
@@ -251,12 +253,21 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Combat")
 	FAttackMontageData FistAttackMontage;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character Combat")
+	float CombatUpdateTime = 0.1f;
+	float CombatUpdateTimeCooldown = 0.f;
+
+	IHealth* CombatTargetInFront = nullptr;
 
 	UFUNCTION()
 	void AttackComboMontage(UAnimInstance* AnimInstance, UAnimMontage* AttackMontage, int MaxCombo);
 
 	UFUNCTION()
 	void SetInCombat(bool InCombat);
+	
+	UFUNCTION()
+	void UpdateCombatTargetInFront();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Combat")
 	bool bInCombat = false;

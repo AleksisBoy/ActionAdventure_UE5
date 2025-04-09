@@ -6,6 +6,7 @@
 #include "Data/NPCData.h"
 #include "WorldInfoSubsystem.h"
 #include "Components/BoxComponent.h"
+#include "UI/NPCWidgetController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
@@ -14,6 +15,7 @@
 #include "GoingAction/GoingActionCharacter.h"
 #include "Game/ActionGameInstance.h"
 #include "Actors/DialogueManager.h"
+#include "Components/WidgetComponent.h"
 #include "DialogueAsset.h"
 
 ANonPlayableCharacter::ANonPlayableCharacter() : Super()
@@ -29,8 +31,45 @@ ANonPlayableCharacter::ANonPlayableCharacter() : Super()
 	InteractionBox->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	InteractionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	InteractionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+	// Widget Component
+	WidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+	WidgetComp->SetupAttachment(RootComponent);
+
+	WidgetComp->SetWidgetSpace(EWidgetSpace::World); 
+	WidgetComp->SetDrawSize(FVector2D(200.0f, 100.0f)); 
+
 }
 
+void ANonPlayableCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (!NPCData) { UE_LOG(LogTemp, Error, TEXT("NO DATA FOR %s"), *GetName()); return; }
+
+	Controller = Cast<ANPCController>(GetController());
+	if (Controller && NPCData->CombatSubTree)
+	{
+		Controller->SetCombatSubTree(NPCData->CombatSubTreeTag, NPCData->CombatSubTree);
+	}
+
+	InteractionBox->OnComponentBeginOverlap.AddDynamic(this, &ANonPlayableCharacter::OnInteractionOverlapBegin);
+	InteractionBox->OnComponentEndOverlap.AddDynamic(this, &ANonPlayableCharacter::OnInteractionOverlapEnd);
+
+	Health = NPCData->BaseHealth;
+
+	WidgetComp->SetWidgetClass(NPCWidgetClass);
+	NPCWidget = Cast<UNPCWidgetController>(WidgetComp->GetWidget());
+	if (NPCWidget) NPCWidget->SetVisibility(ESlateVisibility::Visible);
+
+}
+void ANonPlayableCharacter::EndPlay(const EEndPlayReason::Type Reason)
+{
+	/*if (Overlapping.Contains(this))
+	{
+		Overlapping.Remove(this);
+	}*/
+}
 void ANonPlayableCharacter::QuitDialogue()
 {
 	InDialogue = false;
@@ -57,7 +96,7 @@ FVector ANonPlayableCharacter::GetInteractionLocation()
 
 bool ANonPlayableCharacter::IsAbleToInteract()
 {
-	return !InDialogue && NPCDialogue != nullptr;
+	return !InDialogue && NPCDialogue != nullptr && !InCombat && !IsDead;
 }
 
 FText ANonPlayableCharacter::GetInteractionName()
@@ -93,6 +132,20 @@ ELoyalty ANonPlayableCharacter::GetLoyalty()
 	return NPCData->Loyalty;
 }
 
+bool ANonPlayableCharacter::IsAbleToCombat()
+{
+	return !IsDead && NPCData->CombatSubTree != nullptr;
+}
+
+void ANonPlayableCharacter::EnterCombat()
+{
+	if (InCombat) return;
+
+	InCombat = true;
+	Controller->GetBlackboardComponent()->SetValueAsBool("InCombat", InCombat);
+	UE_LOG(LogTemp, Warning, TEXT("%s entered combat"), *NPCData->Name.ToString());
+}
+
 bool ANonPlayableCharacter::TakeTokens(int Tokens)
 {
 	if (MyAttackTokens < Tokens) return false;
@@ -122,31 +175,6 @@ void ANonPlayableCharacter::SetWalkSpeed(float Speed)
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
-
-void ANonPlayableCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (!NPCData) { UE_LOG(LogTemp, Error, TEXT("NO DATA FOR %s"), *GetName()); return; }
-
-	Controller = Cast<ANPCController>(GetController());
-	if (Controller && NPCData->CombatSubTree)
-	{
-		Controller->SetCombatSubTree(NPCData->CombatSubTreeTag, NPCData->CombatSubTree);
-	}
-
-	InteractionBox->OnComponentBeginOverlap.AddDynamic(this, &ANonPlayableCharacter::OnInteractionOverlapBegin);
-	InteractionBox->OnComponentEndOverlap.AddDynamic(this, &ANonPlayableCharacter::OnInteractionOverlapEnd);
-
-	Health = NPCData->BaseHealth;
-}
-void ANonPlayableCharacter::EndPlay(const EEndPlayReason::Type Reason)
-{
-	/*if (Overlapping.Contains(this))
-	{
-		Overlapping.Remove(this);
-	}*/
-}
 void ANonPlayableCharacter::OnInteractionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// check if it is a player 
@@ -165,9 +193,27 @@ void ANonPlayableCharacter::OnInteractionOverlapEnd(UPrimitiveComponent* Overlap
 {
 	//if (Overlapping.Contains(this)) Overlapping.Remove(this);
 }
+void ANonPlayableCharacter::EnableRagdoll()
+{
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll")); // Important: Ragdoll profile!
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetAllBodiesBelowSimulatePhysics(FName("pelvis"), true, true); // Or "root" if you want everything
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->WakeAllRigidBodies();
+	GetMesh()->bBlendPhysics = true;
+
+	GetMesh()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+}
 void ANonPlayableCharacter::Die()
 {
+	if (IsDead) return;
+
 	UE_LOG(LogTemp, Warning, TEXT("%s DIED"), *GetName());
+	IsDead = true; 
+	EnableRagdoll();
+	Controller->StopMovement();
+	Controller->BrainComponent->StopLogic("NPC Died");
 }
 void ANonPlayableCharacter::Tick(float DeltaTime)
 {

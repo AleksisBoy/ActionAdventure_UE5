@@ -15,10 +15,13 @@ class GOINGACTION_API UCombatSubsystem : public UTickableWorldSubsystem
 public:
 	UCombatSubsystem();
 
-	TArray<IHealth*> Members;
 
 	void StartCombat(IHealth* Initiator);
+	void AddMember(IHealth* Member);
 	void RemoveMember(IHealth* Member);
+	TArray<IHealth*> GetMembers() { return Members; }
+
+	bool CallForCombat(FVector Location, float Radius, AActor* Initiator);
 
 	IHealth* GetClosestTargetFor(IHealth* HealthInterface, int AttackTokens);
 
@@ -32,6 +35,7 @@ public:
 protected:
 	virtual void Tick(float DeltaTime) override;
 
+	TArray<IHealth*> Members;
 	// entity is not in combat ->
 	// entity encounters (sees, gets triggered/alerted) other entity that has different loyalty ->
 	// entity gets into combat ->

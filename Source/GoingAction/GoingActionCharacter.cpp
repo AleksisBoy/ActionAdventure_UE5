@@ -24,6 +24,7 @@
 #include "Game/ActionGameInstance.h"
 #include "Weapons/Weapon.h"
 #include "Data/WeaponAsset.h"
+#include <Kismet/KismetMathLibrary.h>
 
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -123,6 +124,14 @@ void AGoingActionCharacter::OnMontageNotifyBegin(FName NotifyName, const FBranch
 	{
 		AllowAttackCombo();
 	}
+	else if (NotifyName == "AttackStart")
+	{
+		SheathedWeapon->OnAttackStart();
+	}
+	else if (NotifyName == "AttackFinish")
+	{
+		SheathedWeapon->OnAttackFinish();
+	}
 	else if (NotifyName == "StopStrafing")
 	{
 		bIsStrafing = false;
@@ -146,6 +155,14 @@ void AGoingActionCharacter::HealPerc(float Perc)
 {
 	Health = FMath::Clamp(Health + MaxHealth * Perc, 0, MaxHealth);
 	OnPlayerHealthChanged.Broadcast(Health, MaxHealth);
+}
+bool AGoingActionCharacter::IsAbleToCombat()
+{
+	return true;
+}
+void AGoingActionCharacter::EnterCombat()
+{
+	SetInCombat(true);
 }
 bool AGoingActionCharacter::TakeTokens(int Tokens)
 {
@@ -186,6 +203,15 @@ void AGoingActionCharacter::Die()
 void AGoingActionCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!bInCombat) return;
+	
+	CombatUpdateTimeCooldown += DeltaTime;
+	if (CombatUpdateTimeCooldown > CombatUpdateTime)
+	{
+		CombatUpdateTimeCooldown -= CombatUpdateTime;
+		UpdateCombatTargetInFront();
+	}
 }
 
 void AGoingActionCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -464,13 +490,21 @@ void AGoingActionCharacter::Attack(const FInputActionValue& Value)
 		AttackComboMontage(AnimInstance, FistAttackMontage.Montage, FistAttackMontage.Amount);
 		UE_LOG(LogTemp, Warning, TEXT("Player Attacked with fists"));
 	}
+
+	///
+	if (CombatTargetInFront)
+	{
+		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), CombatTargetInFront->GetInterfaceLocation());
+		SetActorRotation(LookAtRotation);
+	}
 }
 
 void AGoingActionCharacter::AttackComboMontage(UAnimInstance* AnimInstance, UAnimMontage* AttackMontage, int MaxCombo)
 {
 	if (AttackMontage == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NULL PTR"));
+		UE_LOG(LogTemp, Warning, TEXT("Attack montage NULL PTR"));
+		return;
 	}
 	if (!AnimInstance->Montage_IsPlaying(AttackMontage))
 	{
@@ -495,8 +529,6 @@ void AGoingActionCharacter::AttackComboMontage(UAnimInstance* AnimInstance, UAni
 		FName CurrentSection = FName(*FString::Printf(TEXT("Attack%d"), CurrentAttackCombo - 1));
 		FName NextSection = FName(*FString::Printf(TEXT("Attack%d"), CurrentAttackCombo));
 
-		UE_LOG(LogTemp, Warning, TEXT("%d"), CurrentAttackCombo);
-
 		AnimInstance->Montage_SetNextSection(CurrentSection, NextSection, AttackMontage);
 	}
 }
@@ -505,8 +537,60 @@ void AGoingActionCharacter::SetInCombat(bool InCombat)
 {
 	if (bInCombat == InCombat) return;
 
+	UWorld* World = GetWorld();
+	if (InCombat && World)
+	{
+		if (!World->GetSubsystem<UCombatSubsystem>()->CallForCombat(GetActorLocation(), 5000.f, this)) return;
+	}
+
 	bInCombat = InCombat;
 	UpdateSpeed();
+}
+
+void AGoingActionCharacter::UpdateCombatTargetInFront()
+{
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	UCombatSubsystem* CombatSub = World->GetSubsystem<UCombatSubsystem>();
+	if (!CombatSub) return;
+
+	// also check for distance
+	float HighestDot = -2.f;
+	IHealth* MemberInFront = CombatTargetInFront;
+	for (IHealth* Member : CombatSub->GetMembers())
+	{
+		if (Member == this) continue;
+
+		FVector DirectionToMember = Member->GetInterfaceLocation() - GetActorLocation();
+		DirectionToMember.Normalize();
+		float Dot = FVector::DotProduct(FollowCamera->GetForwardVector(), DirectionToMember);
+		if (Dot > HighestDot)
+		{
+			HighestDot = Dot;
+			MemberInFront = Member;
+		}
+	}
+	if (MemberInFront != CombatTargetInFront)
+	{
+		CombatTargetInFront = MemberInFront;
+		UE_LOG(LogTemp, Warning, TEXT("Set new Target in front"));
+
+		if (MemberInFront != nullptr)
+		{
+			DrawDebugSphere(
+				GetWorld(),
+				MemberInFront->GetInterfaceLocation(),
+				40.f,
+				16,
+				FColor::Green,
+				false,
+				0.1f, 
+				0,
+				1.0f
+			);
+		}
+	}
 }
 
 void AGoingActionCharacter::TryLockCamera(const FInputActionValue& Value)

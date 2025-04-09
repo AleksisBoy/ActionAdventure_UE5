@@ -12,6 +12,8 @@ struct FNPCScheduleEvent;
 class UBoxComponent;
 class ANPCController;
 class UDialogueAsset;
+class UWidgetComponent;
+class UNPCWidgetController;
 
 UCLASS(Blueprintable, BlueprintType)
 class GOINGACTION_API ANonPlayableCharacter : public ACharacter, public IInteractable, public IHealth
@@ -36,6 +38,8 @@ public:
 	virtual void HealPerc(float Perc) override;
 	virtual ELoyalty GetLoyalty() override;
 	virtual FVector GetInterfaceLocation() { return GetActorLocation(); }
+	virtual bool IsAbleToCombat() override;
+	virtual void EnterCombat() override;
 	virtual bool TakeTokens(int Tokens) override;
 	virtual void ReturnTokens(int Tokens) override;
 
@@ -46,6 +50,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 
+	// Interaction
 	UFUNCTION()
 	virtual void OnInteractionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
@@ -57,6 +62,18 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Interactable Actor")
 	UBoxComponent* InteractionBox = nullptr;
+
+	// Widget Comp
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "NPC UI")
+	UWidgetComponent* WidgetComp = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "NPC UI")
+	TSubclassOf<UNPCWidgetController> NPCWidgetClass = nullptr;
+
+	UPROPERTY()
+	UNPCWidgetController* NPCWidget = nullptr;
+	
+	void EnableRagdoll();
 
 	UFUNCTION()
 	virtual void Die();
@@ -82,6 +99,7 @@ public:
 	FNPCScheduleEvent& GetSchedule(int Index);
 private:
 
+
 	ANPCController* Controller = nullptr;
 	float Health = 0.f;
 
@@ -90,4 +108,10 @@ private:
 
 	UPROPERTY()
 	bool InDialogue = false;
+
+	UPROPERTY()
+	bool InCombat = false;
+
+	UPROPERTY()
+	bool IsDead = false;
 };

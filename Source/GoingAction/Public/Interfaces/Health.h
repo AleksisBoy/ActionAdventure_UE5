@@ -40,6 +40,12 @@ public:
 	virtual FVector GetInterfaceLocation() = 0;
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
+	virtual bool IsAbleToCombat() = 0;
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	virtual void EnterCombat() = 0;
+	
+	UFUNCTION(BlueprintCallable, Category = "Health")
 	virtual bool TakeTokens(int Tokens) = 0;
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
